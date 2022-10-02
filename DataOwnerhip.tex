@@ -3,25 +3,43 @@
 
 % General overview defining data as an asset, actors in data economy, and how SDL can expand 
 
-The crux of the Snickerdoodle Protocol is allowing people to own their data, treat it as an asset, and get value out of it. In this section, we will define data ownership, explain why defining data as an asset is tricky, and the flow of value in the current data economy.
+In this section, we will define data ownership, explain why defining data as an asset is tricky, and establish the flow of value in the current data economy.
 
 \subsection{Ownership}
 
 
 % How can individuals control / own their data
-The Snickerdoodle protocol aims to shift the balance of power within the existing data economy by providing individuals greater control of their data. To do so, we must first understand the value within the existing data economy and what it means to control and own data. While many attempts have been made to codify data control through legislative means, provide our technical definition here:
+The Snickerdoodle Protocol aims to shift the balance of power within the existing data economy by providing individuals greater control of their data. 
+To do so, we must first understand the value within the existing data economy and what it means to control and own data. 
+
 \begin{definition}
 \label{definition:DataOwnership}
-Data Ownership: If an individual can exclusively control and manage the collection, storage, and usage of a piece of data in a secure and private manner, then it can be said that they own it.
+Data Ownership: If an individual can exclusively control and manage the collection, storage, and usage of an attribute of their data corpus in a secure 
+and private manner, then it can be said that they own that particular data attribute.
 \end{definition}
 
 % The goal of this protocol is to maintain the value in the current data economy while flipping the power structure on its head by giving individuals control of the data they generate. This is consistent with the trend we see in modern legislation (CONTINUE TO GIVE CONTEXT).
 
-Ownership of data is a difficult concept to define. Unlike physical resources, data can be copied indefinitely, is generated constantly, and generally requires technical expertise and infrastructure for collection and value extraction. Because of these properties, the safety of data is crucial to data ownership and makes regulating the use of data inherently difficult.
+Ownership of data is a difficult concept to define. Unlike physical resources, data can be copied indefinitely, is generated constantly, and generally requires 
+technical expertise and extensive cyber infrastructure for collection and value extraction. Because of these properties, the safety of data is crucial to data ownership and 
+makes regulating the use of data inherently difficult.
 
-To illustrate these properties, let us use the example of Alice: a customer shopping at a grocery store. By simply being at the store, Alice has generated data about which store she shopped at and when. When she checks out, she generates data about what products she has bought and what payment method she used. When she leaves, she generates data about how long she has been in the store. All of this data may have value, and several actors may be collecting it. The store may be collecting this data through surveillance or loyalty programs. Her phone may have software collecting her location data. Her credit card company may be tracking her spending habits. In the existing data economy, these entities performing the collection have total sovereignty in using that data. They may analyze this data for targeted advertising, conduct market research, or sell it to other parties. In addition, companies collecting this data may take all of these actions with varying standards of privacy, security, or anonymity for Alice. Alice is not likely to have knowledge about what data was collected, who collected it, who has access to it, or how the data is used. She is also not compensated for the value that is extracted from this data, even though she is the one who originated it.
+To illustrate these properties, let us use the example of Alice: a customer shopping at a grocery store. By simply being at the store, Alice has generated data about 
+which store she shopped at and when. When she checks out, she generates data about what products she has bought and what payment method she used. When she leaves, 
+she generates data about how long she has been in the store. All of this data may have value, and several actors may be collecting it. The store may be collecting 
+this data through surveillance or loyalty programs. Her phone may have software collecting her location data. Her credit card company may be tracking her spending 
+habits. In the existing data economy, these entities performing the collection have total sovereignty of these data attributes. They may analyze this data for targeted 
+advertising, conduct market research, or sell it to other parties. In addition, companies collecting this data may take all of these actions with varying standards 
+of privacy, security, or anonymity for Alice. Alice is not likely to have knowledge about what data attributes were collected, who collected it, who has access to it, or how 
+the data is used. She is also not compensated for the value that is extracted from this data, even though she is the entity from whom originated it.
 
-In the above example, the concerns around collection and privacy are immediately apparent, but this example also brings into question what it means to own data. In Alice's case, her data is being collected by third parties who may sell or exchange it with other parties. Due to the infinite duplicability of digital data, any such exchange results in both parties possessing the data. In this case, who actually owns the data? Is it the party that collected it? Is it collectively owned by all parties that are currently storing it? Or is it owned by the party that originated it (Alice)? In the existing model, data is owned by the entities that store it, and may be legally attributable to the entity that collected it (CITE). With our definition, Alice would have control of her data if she knew what data about her was being collected, had control over who was able to access the data, and the infrastructure used to collect, store, and access the data did so safely.
+In the above example, the concerns around collection and privacy are immediately apparent, but this example also brings into question what it means to own data. 
+In Alice's case, her data is being collected by third parties who may sell or exchange it with other parties. Due to the infinite duplicability of digital data, any 
+such exchange results in both parties possessing the data. In this case, who actually owns the data? Is it the party that collected it? Is it collectively owned by 
+all parties that are currently storing it? Or is it owned by the party that originated it (Alice)? In the existing model, data is owned by the entities that store it, 
+and may be legally attributable to the entity that collected it (CITE). According to definition \ref{definition:DataOwnership}, Alice would have control of her data 
+if she knew what aspects about her were being observed, had control over who was able to access the information, and the infrastructure used to collect, store, and 
+access the data did so safely.
 
 % Feel like with other sections this has become redundant
 % I've like the ideas in here so have commented it out for now. We can un-comment if we delete other sections that discuss this ()
@@ -31,7 +49,13 @@ In the above example, the concerns around collection and privacy are immediately
 \subsection{Data as an Asset}
 % Data has value and can be treated as an asset. How is it different/similar to traditional assets
 % https://money.cnn.com/news/newsfeeds/articles/stocktwits/pointsandfigures_9937.html?iid=EL#:~:text=Commodities%20are%20assets%2C%20but%20unlike,can%20derive%20out%20of%20them.
-In an information economy, data is the most fundamental commodity there is. To understand the individualized data economy, we must highlight the difference between assets and commodities. While commodities are an asset class, they have unique properties. Unlike most other asset classes, commodities are traded at high volume. While it is possible to purchase small volumes of commodities, they are often illiquid due to the markets operating at high volumes. While fractional vehicles like ETFs do exist, these are fundamentally not equivalent, as they represent nothing more than a symbolic debt obligation and not the resource itself. For example, it is possible to buy an individual gallon of oil but much harder to sell it as the markets do not trade oil by the gallon. Conversely, it is much easier to sell a thousand barrels of the same oil since the commodities markets trade at these quantities regularly. In much the same way, individual data is not valuable in today's data economy and is almost exclusively traded in the aggregate.
+In an information economy, data is the most fundamental commodity there is. To understand the individualized data economy, we must highlight the difference between assets 
+and commodities. While commodities are an asset class, they have unique properties. Unlike most other asset classes, commodities are traded at high volume. While it is 
+possible to purchase small volumes of commodities, they are often illiquid due to the markets operating at high volumes. While fractional vehicles like ETFs do exist, 
+these are fundamentally not equivalent, as they represent nothing more than a symbolic debt obligation and not the resource itself. For example, it is possible to buy 
+an individual gallon of oil but much harder to sell it as the markets do not trade oil by the gallon. Conversely, it is much easier to sell a thousand barrels of the 
+same oil since the commodities markets trade at these quantities regularly. In much the same way, individual data is not valuable in today's data economy and is almost 
+exclusively traded in the aggregate.
 
 There are cases in which individualized markets have developed around commodities. For example, in the wake of the 2008 financial crisis, consumers rushed to purchase gold as trust in financial assets, currencies, and markets plummeted. Nations and banks often trade in gold in large quantities, and as a result, gold markets trade-in units ranging from the thousands to the millions. To facilitate the liquidity of consumer gold, several gold purchasing operations have sprung up to provide liquidity to the individual and aggregate gold for commodities markets. Because of the non-triviality of data ownership (see below), this infrastructure has yet to be created for data. This is what the Snickerdoodle protocol aims to enable.
 
