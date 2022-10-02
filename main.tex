@@ -1,0 +1,62 @@
+\documentclass{article}
+% \usepackage[utf8]{inputenc}. % default style
+\usepackage{hyperref, graphicx, floatrow} % adds linking on the doc
+
+\usepackage{titlesec}
+
+\setcounter{secnumdepth}{4} % use \paragraph{} for sub sub sub section
+
+
+\setlength\parindent{15pt}           % wider style with less white space 
+\addtolength{\oddsidemargin}{-.875in} % using this for now bc I like wider and the white space way is having issues
+\addtolength{\evensidemargin}{-.875in}
+\addtolength{\textwidth}{1.75in}
+\addtolength{\topmargin}{-.875in}
+\addtolength{\textheight}{1.75in}
+
+
+
+\include{preamble}
+
+% \usepackage[letterpaper, margin=1in]{geometry}   % wider style with more white space
+% \setlength{\parskip}{\baselineskip}
+% \setlength{\parindent}{0pt}
+
+
+\title{Snickerdoodle Protocol}
+
+\author{
+  Lucas Novak\\
+  \texttt{lucas@snickerdoodlelabs.io}
+  \and
+  Varun Parthasarathy\\
+  \texttt{varun@snickerdoodlelabs.io}
+}
+
+\begin{document}
+
+\maketitle
+\tableofcontents{}
+\pagebreak
+
+% \label{section:security}
+% \ref{section:security} example of referencing another section
+
+% footnote{Such noise terms are sometimes referred to as ``flooding" terms.} footnote
+
+% to cite
+% \cite{abbe2012privacy} %-- remove this from bib later. As long as it's not used we don't have to worry about it showing up
+
+\input{Abstract}
+\input{Introduction}
+\input{Background}
+\input{DataOwnerhip}
+\input{Implementation}
+\input{Tokenomics}
+\input{Future}
+\input{Conclusion}
+
+\bibliographystyle{unsrt}
+\bibliography{research}
+
+\end{document}

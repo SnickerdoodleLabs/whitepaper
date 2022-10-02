@@ -1,0 +1,104 @@
+   %%%% Packages
+
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\usepackage{savesym}
+\usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\floatname{algorithm}{Procedure}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\savesymbol{comment}
+\usepackage{easyReview}
+
+\usepackage{comment}  %% block comments
+
+\usepackage{color}
+\newcommand{\vnote}[1]{\textcolor{red}{Vinod's note: {#1}}}
+\newcommand{\leonote}[1]{\textcolor{red}{Leo's note: {#1}}}
+\newcommand{\writeme}{\textcolor{red}{Write Me}}
+
+\newcommand{\round}[1]{\lceil #1 \rfloor}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+\newcommand{\bigfloor}[1]{\big\lfloor #1 \big\rfloor}
+\newcommand{\Bigfloor}[1]{\Big\lfloor #1 \Big\rfloor}
+
+\newcommand{\anglebracks}[1]{\langle #1 \rangle}
+
+\makeatletter
+\newcommand\newtag[2]{#1\def\@currentlabel{#1}\label{#2}}
+\makeatother
+
+%
+% defining the \BibTeX command - from Oren Patashnik's original BibTeX documentation.
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08emT\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+    
+    
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{remark}{Remark}[section]
+
+\newcommand{\calA}{\mathcal{A}}
+   
+   \newcommand{\olea}{\alpha}
+    \newcommand{\oleb}{\beta}
+    \newcommand{\olex}{x}
+    \newcommand{\oleg}{\gamma}
+    \newcommand{\veca}{\boldsymbol{\olea}}
+    \newcommand{\vecb}{\boldsymbol{\oleb}}
+    \newcommand{\vecx}{\mathbf{\olex}}
+    \newcommand{\vecg}{\boldsymbol{\oleg}}
+    
+    \newcommand{\encd}[1]{[\![ #1 ]\!]}
+    
+    \newcommand{\getsr}{\xleftarrow{\$}}
+    
+    \newcommand{\ring}{\mathcal{R}}
+    \newcommand{\Z}{\mathbb{Z}}
+    \newcommand{\olering}{\Z_p}
+    
+    \newcommand{\KeyGen}{\mathsf{KeyGen}}
+    \newcommand{\Encrypt}{\mathsf{Encrypt}}
+    \newcommand{\Decrypt}{\mathsf{Decrypt}}
+    
+    \newcommand{\sk}{\mathsf{sk}}
+    \newcommand{\pk}{\mathsf{pk}}
+    \newcommand{\evk}{\mathsf{evk}}
+    \newcommand{\ct}{\mathsf{ct}}
+    
+    \newcommand{\Eval}{\mathsf{Eval}}
+    \newcommand{\EvalAdd}{\mathsf{EvalAdd}}
+    \newcommand{\EvalAddPlain}{\mathsf{EvalAddPlain}}
+    \newcommand{\EvalMultPlain}{\mathsf{EvalMultPlain}}
+    
+    \newcommand{\Sim}{\mathsf{Sim}}
+    \newcommand{\Dis}{\mathcal{D}}
+    \newcommand{\View}{\mathsf{View}}
+    
+    \newcommand{\RLWE}{\mathsf{RLWE}}
+    
+    \newcommand{\Hybrid}{\mathsf{Hybrid}}
+    
+    \newcommand{\VOLE}{\mathsf{VOLE}}
+    \newcommand{\BOLE}{\mathsf{BOLE}}
+    
+    \newcounter{protocol}
+    \makeatletter
+    \newenvironment{protocol}[1][htb]{%
+        \let\c@algorithm\c@protocol
+        \renewcommand{\ALG@name}{Protocol}% Update algorithm name
+        \begin{algorithm}[#1]%
+    }{
+        \end{algorithm}
+    }
+    \makeatother
+    
+    \newcommand{\sbline}{\\[.5\normalbaselineskip]}% small blank line

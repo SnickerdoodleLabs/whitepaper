@@ -1,0 +1,74 @@
+\paragraph{Manage} % + Consent
+People will be able to manage their data and consent through the use of a data wallet. The data wallet will be able a user friendly application that allows users to manage the on-chain aspects of the protocol (for more information about the V1 implementation see \ref{section:DataWallet}). 
+% TODO figure out how we want to highlight different issues of privacy, security, authenticity, improbability
+% TODO figure out flow
+% TODO figure out how much problem we want to define and how much solution we want to provide
+\newline
+$\mathbf{privacy}$: 
+A data wallet has 2 main worries when it comes to privacy. First, the data wallet should allow the owner to manage the privacy settings of the data. This includes having multiple identities for different purposes, specifying consent, and only revealing what they want others to know. Second, who, besides the data owner, is able to know the management settings of the data wallet. This worry also extends to metadata associated with managing the data, such as knowing when some data was stored or shared. 
+\newline
+$\mathbf{security}$:
+Only the owner of the data wallet should be able to use the data wallet. No one else should be able to move the data or impersonate the owner. The data wallet owner could allow a designated fiduciary to control data on their behalf and resend that control at any time. There should also be different security settings that can be adjusted based on the use case. Additionally, the security of both the data wallet and the protocol as a whole needs to be able to be updated over time.
+\newline
+$\mathbf{interoperability}$:
+The data wallet should be able to work with any chain, can integrate with other identity and data providers, and the owner of the data wallet should be able to switch to other data wallets.
+\newline
+$\mathbf{authenticity}$:
+Data wallets should be able to integrate with identity validates / providers in order to validate themselves. % weird sentence
+\paragraph{Collect}
+The protocol will enable people to specify what data sources they want their data wallet to manage. Lots of services collect data on behalf of their users and those same individuals should be able to manage that data through their data wallet (e.g., Google search history or medical records at a hospital). 
+\newline
+$\mathbf{privacy}$:
+Within the protocol, privacy boils down to if others can figure out where the data is collected from.
+\newline
+$\mathbf{security}$:
+Storage of data should be encrypted (both in transit and at rest) and be safe from bugs.
+\newline
+$\mathbf{interoperability}$:
+Other stakeholders besides the collector should be able to easily use the data (for a full list of actors see \ref{section:Actors}). To achieve this the schemes used should have a decentralized way to be defined and hosted. 
+\newline
+$\mathbf{authenticity}$:
+Authenticity boils down into 2 problems. First, identifying where the data came from. This can be a tricky problem to solve while maintaining privacy. E.g., letting others know my age is validated from the California DMV without revealing I went to the Santa Clara DMV. The second problem is making sure that the person requesting access to the data (e.g., Bob has access to his hospital data but not Carol's). A good identity+key management system can help with these problems.
+\paragraph{Store}
+The protocol with enable a data custodian to store the data on behalf of an individual in a trustless manner. (for more info on the custodian see \ref{section:Actors})
+%maybe update reference
+\newline
+$\mathbf{privacy}$:
+The custodian of the data should know as little about the individual and their data as possible and be able to prove they've deleted any data they've been asked to delete. 
+\newline
+$\mathbf{security}$
+Data should only be able to be access by authorized users. Additionally, data that's been asked to be stored should be able to be arbitrarily deleted or modified. 
+\newline
+$\mathbf{interoperability}$:
+The data's schema should be stored along with the data itself. 
+\newline
+$\mathbf{authenticity}$:
+The information about where the data came from should be kept with the data in a private way. The security problem of making sure the data isn't tampered with is also an authenticity issue.
+\paragraph{Share}
+The protocol will enable users to safely share their data with other parties. 
+\newline
+$\mathbf{privacy}$:
+Once the data is shared, the data owner should not be able to be identified and the act of sharing the data should not be known to anyone other than the owner. Additionally, backwards secrecy should be maintained.
+\newline
+$\mathbf{security}$
+Only authorized users should be able to know anything about the shared data and only the consented data should be shared.
+\newline
+$\mathbf{interoperability}$
+The data being shared should be in the appropriate format. 
+\newline
+$\mathbf{authenticity}$
+The data being shared needs to be the correct data (e.g., I can't share a fake CA licence number). This can be hard to guarantee with making sure the data is private (e.g., if I share a licence from CA then you know I have a relationship with CA).
+\paragraph{Subscribe}
+The protocol will allow certain parties to be able to subscribe to the data, allowing them to temporarily be able to use that data to gain insights. 
+\newline
+$\mathbf{privacy}$:
+The subscribers of data should not be allowed to consume data that can be used to re-identify individuals. 
+\newline
+$\mathbf{security}$
+Subscribers should not be able to keep the data in perpetuity and any data they get access to should remain secure.
+\newline
+$\mathbf{interoperability}$
+Subscribers should be able to leverage their on any platform and pull from any data source.
+\newline
+$\mathbf{authenticity}$
+Subscribers should have a way to verify the data they are subscribing to is accurate.

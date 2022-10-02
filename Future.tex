@@ -1,0 +1,115 @@
+\section{Future Considerations}
+\label{section:Future}
+% make sure we highlight problems we referenced earlier in paper
+The First version of the Snickerdoodle Protocol won't be able to achieve everything we aim to achieve. This section will detail potential improvements we can make to the protocol and potential risks the protocol faces.
+
+\subsection{Potential Improvements}
+This section will deal with potential improvements we can make to the protocol. Many of the changes are related but each change can be made independently.  
+
+\subsubsection{Data Sharing}
+% Federated Learning
+% Perturbation Techniques (Differential Privacy)
+%       Could solve privacy issue with ingestion
+% Anonymization Techniques 
+%       Could solve privacy issue with ingestion
+% Multi-Party Compute
+% Compute-to-Data
+% private query cohorts / private groups
+Currently, the protocol enables a basic version of data sharing, where only a simple set of predefined functions can be run on an individual's data and shared with one subscriber. An easy way to improve the protocol would be to enable more possible functions to run on this compute-to-data model. The currently allowed functions can only be run on a single individual's data. We could extend the protocol to run functions on multiple people's data before returning, thus enabling Multi-Party-Compute. Data is also only allowed to flow from data wallets to ingestion providers. Instead, we could create a back and forth between the data wallet and the subscriber. Allowing this back and forth would enable us to create a system to support federated learning. The subscriber would send over a pre-trained model, the wallet would update the model and send it back, and then the subscriber could combine the updates from every wallet and repeat the process.
+Additionally, we can make changes to improve the privacy of the protocol. We could have the wallet use different anonymization techniques to prevent the wallet from sending PII to the insight service. Similarly, the wallet could expand its use of perturbation techniques and differential privacy. We can also add changes to how the protocol gets queries from the content addressing network to hide what queries subscribers are running. For example, we could create private query cohorts, so only a subset of the network knows what questions a business is interested in.
+
+\subsubsection{Atomic Reward Swaps}
+\label{section:AtomicSwaps}
+The initial version of the protocol involves a trust-centric rewards-sharing mechanism. Ideally, there would not be any trust involved. The data owner only shares their insight once they know they will get a reward. The data subscriber will only send the rewards once they know they will receive a valid insight. One way to solve the transfer problem is with Zero-Knowledge atomic swaps (CITE). Only when both sides can guarantee that a valid trade will happen will insights and rewards be exchanged. We can also extend atomic swaps to cross-chain interactions. For a discussion on ensuring that insights are valid, see section \ref{section:DataOutsourcing}.
+
+% https://ieeexplore.ieee.org/document/9181875
+% https://eprint.iacr.org/2022/717.pdf
+% https://patentscope.wipo.int/search/en/detail.jsf?docId=SG253980096&docAn=10201903150Q
+
+\subsubsection{Cryptography}
+% ZK-proofs
+%   Could solve rewards issue
+% Signing Scemas
+% Data-Leasing
+% Data Tracking
+%   proof of storage
+%   proof of deletion (lol)
+The ability to update the cryptography is built into the Snickerdoodle Protocol because it is essential to patch security holes. This same idea allows us to add new cryptography that can enable new ways for the system to provide data safety guarantees. 
+
+This wouldn't be a web3 white paper if we didn't mention how ZK-proofs could improve our system (lol this can be removed). ZK-proofs could allow data wallets to get consent tokens or rewards without others in the network knowing. Introducing new signing schemas will enable us to create proper data fiduciaries who can safely allow individuals to delegate their consent to others. Some interesting cryptography may enable data to be leased by only allowing decryption for a set amount of time. Additionally, we can use different cryptographic ideas to increase data tracking of data custodians (e.g., proof of storage and proof of deletion).
+
+\subsubsection{Data Outsourcing}
+\label{section:DataOutsourcing}
+% Third-Party Implicit data (Collectors / EXtractors)
+%   - Authorized Data Providers / Signers
+% Data Custodians
+% Data Fiduciaries
+%   - Data unions
+% Query Functionality
+%   - Governance
+%   - Permission Models (we might already have)
+%   - Data Schemas
+%   - Query Functions
+
+% TODO this section is especially rough
+Another avenue we want to look at for increasing the protocol's usefulness is increasing the amount of data that the protocol can collect. We can do this in several ways: enabling third-party verified data (e.g., DMV signed driver's license), expanding the data wallet to allow other methods of storage (e.g., delegating my personal Dropbox to store data on my behalf), and creating better ways for individuals to combine their data preemptively to create data unions. 
+
+Lastly, we can improve a vast amount of functionality by increasing what can be managed on-chain by the DAO. We can add more query functions. We can also update the output of queries to update what data ingestors. And we can create a way to manage data schemas collected by verified third parties. 
+
+\subsubsection{Form Factor}
+\label{section:FormFactor}
+%   - MOBILE
+%   - Headless
+%       - IOT
+%   - Interobability 
+%       - Chain agnostic
+The Snickerdoodle Protocol can also update its form factor. We can make it so the protocol can work across chains. (maybe something about oracles with rewards and EVM compatibility). We can make the protocol work on headless browsers so it can live on IoT devices. We can also move the data wallet onto mobile, which is a natural extension given how much personal data individuals generate on mobile devices.
+
+\subsection{Potential Risks}
+This section will detail risks with the protocol we are worried about and hope to address. These risks include worries about market adoption, security of the protocol, privacy, and equity of data as an asset.
+
+\subsubsection{Market Adoption}
+% Mitigation through incentives
+% Mitigation through business-driven adoption
+% Mitigation through tokenomics
+One of the most significant issues preventing the Snickerdoodle Protocol from improving the data economy is the adoption of the protocol; i.e., the Snickerdoodle protocol can't help people own their data if no one is using the protocol. This is especially difficult because we are trying to create demand and supply within a market. We have several ways we can increase the likelihood of adoption:
+\begin{itemize}
+  \item Improving incentives, such as rewards from sharing data and even boosting rewards for early adopters
+  \item Snickerdoodle Labs can partner with businesses to ensure the protocol addresses their needs and increase the rewards available to people
+  \item The tokenomics of the protocol can help increase early adoption
+\end{itemize}
+\subsubsection{Security}
+% Data wallets need to be secure
+%   - Encryption techniques
+%       - POST quantum
+%   - Upgradablility
+% Data transfers must be secure
+%   - Ingestion service shouldn't need to be secure for data to be safe
+Another risk addressing the protocol is the security of the system. Individuals can't own their own their data if it is not secure and gets stolen. Data wallets need to use strong encryption techniques to protect collected data and should be upgradable to fix issues with security. For example, we can upgrade the encryption when systems need to become post-quantum secure. Another piece of attack vector that needs to be protected is when data and insights are shared. The transfer can be protected through standard means, such as TLS and HTTPS. It's harder to ensure strong security when data is sent to an ingestion provider. People need to know their data is secure regardless of the ingestion provider. Reputation scores can help people choose which provider they want to send their data to, and the DAO vote on authorized ingestors. There may be creative ways to add a token penalty if someone can prove an ingestion provider didn't hold their data securely. Another approach is reducing the harm if an ingestion service leaks data.
+
+\subsubsection{Privacy}
+% Ensuring privacy during ingestion
+% Transparency into data use
+% How do we ensure anonymity / prevent user tracking by third parties?
+%   - De-anonymization
+%   - Rewards tracking
+% Prevent erosion of privacy through governance
+% How sensitive is a wallet address in a post web3 world?
+%   - Now
+%   - Future
+
+Privacy issues are also a prominent issue facing the protocol. While the current economy does not lend much privacy to individuals, the Snickerdoodle Protocol aims to improve privacy significantly and shouldn't worsen privacy on web3. There are some potential privacy issues that the protocol faces. First, once data leaves a wallet and is sent to an ingestion provider, the user no longer has any direct control over the wallet. Ideally, the user should know, regardless of where the calculations on their data are being sent, that they aren't at risk of being identified, tracked, or any other risks of de-anonymization.  
+
+Second, the protocol is built on a public blockchain. Metadata about the protocol will be public for everyone to see. We don't want this metadata, such as what a user is consenting to or what rewards a wallet has received, to be able to lead to any negative consequences. Earlier in this section we've discussed several ways we could improve the protocol to prevent this.
+
+Third, changes in the protocol through governance could lead to an erosion of privacy. We need to create checks to prevent this. Additionally, the protocol should be build and continued to built with forward-secrecy in mind. Specifically, changes in the protocol shouldn't reveal previously private data or messages.
+
+A fourth issue is we currently don't know how sensitive a wallet address is in a post mass web3 adoption world. A wallet address that isn't linked to any other bit of information is not PII because it can't be linked back to anyone; however, a single link and suddenly everyone can know who that wallet address is linked to. If users in a web3 world use and link the same wallet with many different applications then for most people their wallet would be PII. This feels eerily similar to using email addresses in web2: they are used to login and verify an account and early on most people didn't mind giving them away willy-nilly but now if you do you know you'll get targeted with one form or another with spam. 
+
+\subsubsection{Equity}
+% How can we ensure that token supply does not consolidate?
+% How do we ensure that rewards are equitable?
+%   - Tokens and NFTs
+% Tokens supposed to represent data share?
+%   - How do we ensure equity in data share?
+We are turning data into an asset and like any asset issues of equity should be a major concern. From a governance perspective we need to make sure that supply doesn't consolidate and leave the protocol at risk. From an individual's perspective we need to make sure no group of people are unfairly and systematically given reduced value on their data, especially historically disenfranchised individuals. For example, not all data in the current economy is treated equal. Data from iPhones' are worth more because people who buy iPhones typically have more more (CITE). We don't want to create a system that naively perpetuates the current systems of wealth inequality.
