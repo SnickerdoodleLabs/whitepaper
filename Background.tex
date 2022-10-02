@@ -1,5 +1,7 @@
 \section{Background}
-Before we begin discussing how the Snickerdoodle protocol works, it's worth diving into what problems the protocol aims to solve. This section will address our problem statement, the terminology we will be using throughout the paper, and other solutions that have been proposed or built to try and address similar problems.
+
+This section will address our problem statement, the terminology we will be using throughout the paper, and other solutions that have been proposed or built to try 
+and address similar problems. 
 
 \subsection{Problem Statement}
 % User data is extracted but not owned by the user and data is handled unsafely
@@ -11,18 +13,20 @@ Before we begin discussing how the Snickerdoodle protocol works, it's worth divi
 % This leads us to the Snickerdoodle finds the following problem:
      
 
-$$\textit{Individuals are constantly having their data extracted from them but they don't own that data}$$
+$$\textit{Individuals are constantly producing data from which actionable business intelligence is derived but these individuals do not own this value creation}$$
 
-Large companies are constantly monitoring their users for data and these users don't have a good way to control their data. This observation and collection of people's data played a large factor in the shaping of the modern economy (CITE), even called surveillance capitalism by some (CITE). This has led to a variety of negative consequences, such as (TODO SOURCES PLUS FLESH OUT -- stuff about who gets the value and security, privacy, surveillance consequences, transparency, compensation, consent). 
+Large companies are constantly monitoring their users for data while these users do not have a viable mechanism by which to control their data. This observation 
+and collection of end-user data played a large factor in the shaping of the modern economy, even called surveillance capitalism by some. This has led to a 
+variety of negative consequences, such as who gets the value and security, privacy, surveillance consequences, transparency, compensation, and consent. 
 
-The Snickerdoodle Protocol will help individuals control their own data. This will increase the security and privacy of data and allow people to effectively monetize the data they generate. Additionally, it will make it simpler for companies interested in data to run analysis while respecting data privacy legislation as they can use the protocol as their data infrastructure. 
-
-While the protocol aims to allow individuals to own their data, it is tricky to define what exactly it means to own a piece of data. We define data ownership in definition \ref{definition:DataOwnership} and elaborate on the concept in section \ref{section:DataOwnership}.
-
-
+The Snickerdoodle Protocol will help individuals control their own data as well as understand its use and derive value from it. This will increase the security 
+and privacy of data and allow people to effectively monetize the data they generate. Additionally, it will make it simpler for companies interested in data to 
+run analysis while respecting data privacy legislation as they can use the protocol as their data infrastructure.
 
 \subsection{Terminology}
-Throughout this paper, we will be using a variety of technical terms to describe the protocol. This section will define those terms and give context to why they are important.
+
+This section will define those terms and give context to why they are important.
+
 \subsubsection{Decentralization}
 % - Permissionless 
 % - Trustless
@@ -32,22 +36,31 @@ Throughout this paper, we will be using a variety of technical terms to describe
 Decentralization: When control over a system is held by a group rather than a single authority.
 \end{definition}
 
-In order to prevent a single party from getting too much control in the data economy, including Snickerdoodle Labs, the Snickerdoodle Protocol will be built on top of a decentralized blockchain. 
+In order to prevent a single party from acquiring undue influence in the data economy, including Snickerdoodle Labs, the Snickerdoodle Protocol will be built on top of a 
+decentralized blockchain data structure. 
 
-An important distinction is that decentralization by itself isn't the ultimate goal. Rather we want the Snickerdoodle Protocol to be permissionless, trustless, and available and the only known way to achieve these properties is by making the protocol decentralized.
+An important note is that decentralization by itself not the ultimate goal. Rather, the goal of the Snickerdoodle Protocol is to be permissionless, trustless, and available. 
+Currently, only known viable way to achieve these properties is by designing the protocol to be inherently decentralized.
 
 $\mathbf{Permissionless}$
-Anyone who follows the protocol's rules should be able to interact with the protocol. This means that Snickerdoodle Labs should not be able to decide which individuals are able to collect and share their data, choose what businesses are able to request data, and what developers are able to build on top of the protocol. 
+Anyone should be able to interact with the protocol without the permission of a trusted third party. Snickerdoodle Labs must not be in a position to decide which individuals 
+are able to collect and share their data, choose what businesses are able to request data, and what developers are able to build on top of the protocol. 
 
-The rules of the protocol will be determined by a Decentralized Autonomous Organization (DAO) which will create a decentralized way to manage the protocol (CITE). See sections \ref{section:DAO}, \ref{section:ImplementationDAO}, and \ref{section:TokenDAO} for more details about the Snickerdoodle DAO.
+The rules of the protocol will be determined by a Decentralized Autonomous Organization (DAO) which will create a decentralized way to manage the protocol. 
+See sections \ref{section:DAO}, \ref{section:ImplementationDAO}, and \ref{section:TokenDAO} for more details about the Snickerdoodle DAO.
 
 $\mathbf{Trustless}$
-No one in the system needs to rely solely on trust in order for the protocol to function.  Actors in the system shouldn't need to rely on Snickerdoodle Labs or any other actors in order to own their own data or buy insights.
+The operation of the system should not require trust in a particular, centralized third party in order for the protocol to function.  Actors in the system must not 
+need to rely on Snickerdoodle Labs or any other actors in order to own their own data or acquire insights.
 
-It is worth pointing out that there are no such things as completely trustless and there are varying levels of trustlessness. Ideally, one can trust many mathematicians and engineers that the math and systems built will force the system to behave in the correct way. In the worst case, a strong financial incentive can be relied on for the system to behave correctly. The Snickerdoodle Protocol will rely on both types of trustlessness and aim to update the protocol to use stronger forms of trustlessness over time.
+It is worth noting that completely trustless systems do not exists, but there are varying levels of trustlessness. Ideally, one can trust many mathematicians 
+and engineers that the math and systems built will force the system to behave in the correct way. In the worst case, a strong financial incentive can be relied on for 
+the system to behave correctly. The Snickerdoodle Protocol will rely on both paradigms of trustlessness and aim to update the protocol to use stronger forms of trustlessness 
+over time.
 
 $\mathbf{Availability}$
-Actors in the system should be able to take feasible actions in the system in a reasonable amount of time. No one would use a system that can't be used when they want to use it. There's no point in individuals being able to own and control their own data if they aren't able to do anything with their data. 
+
+Actors in the system should be able to take feasible actions in the system in a reasonable amount of time.
 
 \subsubsection{Data Safety}
 % After writing this paper we don't use this term too much. I'm not entirely opposed to removing this and replacing the use of safety else where 
@@ -58,19 +71,27 @@ Actors in the system should be able to take feasible actions in the system in a 
 Data Safety: Data is considered safe if it is securely stored and privately viewed.
 \end{definition}
 
-When describing data, we often say that it is $\textit{safe}$ in order to encompass all aspects of data security and privacy. Safe data is data that is securely written, stored, transmitted, and accessed in a privacy-preserving manner. This means that the Snickerdoodle Protocol will have to have a strong sense of identity management that only allows authorized people are able to access and know about the data. We implement this identity management via the Snickerdoodle Data Wallet discussed in section \ref{section:DataWallet}. 
+When describing data, we often say that it is $\textit{safe}$ in order to encompass all aspects of data security and privacy. Safe data is data that is securely 
+written, stored, transmitted, and accessed in a privacy-preserving manner. This means that the Snickerdoodle Protocol will have to have a strong sense of identity 
+management that only allows authorized people are able to access and know about the data. We implement this identity management via the Snickerdoodle Data Wallet 
+discussed in section \ref{section:DataWallet}. 
 
 \subsubsection{Data Subscribers \& Insights}
+
 \begin{definition}
 \label{definition:DataSubscriber}
 Data Subscriber: A data subscriber is a data-consuming entity that pays for temporary access to data to gain insights
 \end{definition}
+
 \begin{definition}
 \label{definition:Insight}
-Insight: An insight is the information gained from analyzing data
+Insight: An insight is actionable intelligence gained from applying a function or algorithm to an appropriately structured data set. 
 \end{definition}
+
 % Data consuming entity
-In the modern data economy, there are many organizations that need data to gain insights into the world. With this insight, these organizations are able to learn more about the world and take more informed actions. Data subscribers are interested primarily in the insights that data provides rather than the raw data itself. In a world where data is owned by individuals, organizations wouldn't be able own and store individual data forever, rather they would pay to be granted temporary access to that data to gain insights.
+In the modern data economy, all organizations need to make informed operational decisions. Data subscribers are interested primarily 
+in the insights that data provides rather than the raw data itself. In a world where data is owned by individuals, organizations 
+would not be able to store and own individual data forever, rather they would pay to be granted temporary access to that data to produce insights.
 
 
 % old sections we had definitions for
@@ -85,11 +106,17 @@ In the modern data economy, there are many organizations that need data to gain 
 % \paragraph{Signing}
 
 \subsection{Other Solutions}
+
 There are a variety of different approaches and technologies that aim to allow users to own their own data. In this section, we discuss some of these approaches
+
 \subsubsection{Policy Solutions}
 %Follow GDPR + CPAA
 %Warehousing / Data lake
-Policy decisions such as GDPR in the European Union or the CCPA in California, attempt to regulate consolidated data warehouses and other types of centralized storage. These give individuals rights that allow them to control how their data is used (CITE). These laws are a good step in giving individuals ownership over their data; however, these laws can be hard for people to interpret, for developers to build for, and for people to act on if the laws are broken (CITE + maybe give examples). The solution Snickerdoodle Labs aims to build aims to fix these problems by making a system that is compliant with these regulations, easy for developers to build with to allow their systems to be compliant, and easy for individuals to express their rights.
+Policy decisions such as GDPR in the European Union or the CCPA in California, attempt to regulate consolidated data warehouses and other types of centralized storage. 
+These give individuals rights that allow them to control how their data is used. These laws are a positive step towards giving individuals ownership over their data. 
+However, these laws can be hard for both end-user and application developers to interpret. Snickerdoodle Labs aims to address these problems by 
+building a system that is compliant with these regulations by default, easy for developers to leverage for their applications, and easy for individuals to express 
+their rights.
 
 
 \subsubsection{Data Sharing Techniques}
@@ -98,9 +125,16 @@ Policy decisions such as GDPR in the European Union or the CCPA in California, a
 %Federated Learning
 %Data Outsourcing
 %   -We are making
-There also exist a number of solutions that attempt to tackle the issues surrounding data-sharing. For example, perturbation techniques like differential privacy have shown promise in sharing noisy and/or anonymized data with limited value loss (CITE). Techniques such as federated learning and  multi-party-compute have been used to train models on distributed data sets(CITE). In addition, data outsourcing techniques have been employed to separate the management of data from its storage(CITE). All of these solutions are still yet to find practical applications for the most part and are hard for others to build on (CITE). Snickerdoodle Labs aims to combine the best of recent advancements to make it easy to develop these kinds of solutions. 
+There also exist a number of solutions that attempt to tackle the issues surrounding data-sharing. For example, perturbation techniques like differential privacy 
+have shown promise in sharing noisy and/or anonymized data with limited value loss \cite{dwork2008differential}. Techniques such as federated learning and  
+multi-party-compute have been used to train models on distributed data sets \cite{li2020federated}\cite{lindell2005secure}. In addition, data outsourcing 
+techniques have been employed to separate the management of data from its storage \cite{di2007data}. All of these solutions are still yet to find practical applications 
+for the most part and are hard for others to build on.
 
 \subsubsection{Web3 Solutions}
 % Data pools / unions
 % Data set markets (Ocean)
-The newness and distributed nature of web3 provide a natural way to explore data ownership and decentralize the control of data. Ceramic creates a way to create link existing databases in a decentralized manner and manage their identity (CITE). Ocean Protocol creates a data set market by allowing people to sell access to data sets and bring compute to data (CITE). While these projects are inspired and create new ways to interact with data in a decentralized way, they don't address the problem of allowing individuals to own and control their data. 
+The distributed nature of web3 technologies provide a natural way to explore data ownership and decentralize the control of data. Ceramic creates a way to 
+create link existing databases in a decentralized manner and manage their identity \cite{CeramicNetwork}. Ocean Protocol creates a data set market by allowing 
+people to sell access to data sets and bring compute to data \cite{OceanProtocol}. While these projects are inspired and create new ways to interact with data 
+in a decentralized way, they don't address the problem of allowing individuals to own and control their data. 
