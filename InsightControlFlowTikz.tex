@@ -1,0 +1,28 @@
+\begin{figure*}[!htbp] 
+    \centering
+    \tikzstyle{decision} = [diamond, draw, fill=blue!20,
+    text width=4.5em, text badly centered, node distance=2.5cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20,
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, very thick, color=black!50, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=4.5cm, auto]
+\begin{tikzpicture}[scale=4, node distance = 3cm, auto]
+    % Place nodes
+    \node [block] (CC) {Consent Contract};
+    \node [cloud, left of=CC] (CCF) {Contract Factory};
+    \node [block, below of=CC] (identify) {Event Detection};
+    \node [block, below of=identify] (evaluate) {Query Evaluation};
+    \node [block, below of=evaluate, node distance=2.5cm] (permissions) {Permission Resolution};
+    \node [block, below of=permissions, node distance=2.5cm] (data) {Persistence Layer Access};
+    \node [cloud, right of=data] (AS) {Aggregation Service};
+    % Draw edges
+    \path [line] (CC) -- node {requestForData event} (identify);
+    \path [line] (identify) -- node {CID resolution and query fetch} (evaluate);
+    \path [line] (evaluate) -- node {AST Evaluation} (permissions);
+    \path [line] (permissions) -- node {read only access} (data);
+    \path [line,dashed] (CCF) -- (CC);
+    \path [line,dashed] (data) -- (AS);
+\end{tikzpicture}
+    \caption{Control Flow from requesting to receiving an insight from the data wallet network.}
+    \label{fig:InsiteControlFlow}
+  \end{figure*}
