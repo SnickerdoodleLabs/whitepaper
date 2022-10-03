@@ -23,6 +23,63 @@ It is also worth highlighting that while Snickerdoodle Labs will be providing se
 %      Method to collect, consent, store, share, manage
 %.     in a safe fashion
 %
+
+\begin{figure*}[!htbp] 
+  \centering
+  \begin{tikzpicture}[
+    scale=0.75,
+    start chain=1 going below, 
+    start chain=2 going right,
+    node distance=1mm,
+    desc/.style={
+      scale=0.75,
+      on chain=2,
+      rectangle,
+      rounded corners,
+      draw=black, 
+      very thick,
+      text centered,
+      text width=8cm,
+      minimum height=12mm,
+      fill=purple!60
+      },
+    it/.style={
+      fill=violet!10
+    },
+    level/.style={
+      scale=0.75,
+      on chain=1,
+      minimum height=12mm,
+      text width=2cm,
+      text centered
+    },
+    every node/.style={font=\sffamily}
+  ]
+  
+  % Levels
+  \node [level] (Level 5) {Presentation Layer};
+  \node [level] (Level 4) {Identity Layer};
+  \node [level] (Level 3) {Events Layer};
+  \node [level] (Level 2) {Execution Layer};
+  \node [level] (Level 1) {Permissions Layer};
+  \node [level] (Level 0) {Data Layer};
+  
+  % Descriptions
+  \chainin (Level 5); % Start right of Level 5
+  % application layers
+  \node [desc, it] (Form) {Application and Form Factor Logic};
+  \node [desc, it, continue chain=going below] (Identity) {Signature Verification and Identity Creation};
+  % protocol layers
+  \node [desc] (Events) {Environment and Protocol Event Detection};
+  \node [desc] (Execution) {Query Interpretation and Execution};
+  \node [desc] (Permissions) {Granular Attributed-Based Access Control};
+  \node [desc] (Data) {Indexing/Storage/Synchronization of Web2/Web3 Data};
+  
+  \end{tikzpicture}
+  \caption{Logical structure of a protocol data wallet.}
+  \label{fig:DataActors}
+\end{figure*}
+
 The data wallet is the primary end-user client interface within the Snickerdoodle protocol. It enables data ownership by helping the user control and consent to the collection, storage, and usage of their data. The data wallet will facilitate this by providing the following functionality:
 \begin{itemize}
   \item Secure storage of the data
