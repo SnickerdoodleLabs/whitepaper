@@ -135,19 +135,19 @@ easily be faked or modified, then the insights derived from the data set become 
 \begin{figure*}[!htbp] 
     \centering
     \begin{tikzpicture}
-        \path[mindmap,concept color=black,text=white]
-          node[concept] {Data Economy}
-          [clockwise from=0]
-          child[concept color=green!50!black] {
-            node[concept] {Data Collectors}
-            [clockwise from=90]
-            child { node[concept] {Custodian} }
-            child { node[concept] {Aggregator and Analyzer} }
-            child { node[concept] {Subscriber} }
-          }  
-          child[concept color=orange] { node[concept] {Data Owner} }
-          child[concept color=orange] { node[concept] {Data Owner} };
-      \end{tikzpicture}
+      \path[mindmap,concept color=purple!60,text=black]
+        node[concept] {Data Economy}
+        [clockwise from=0]
+        child[concept color=violet!20] {
+          node[concept] {Data Collectors}
+          [clockwise from=90]
+          child { node[concept] {Custodian} }
+          child { node[concept] {Aggregator and Analyzer} }
+          child { node[concept] {Subscriber} }
+        }  
+        child[concept color=violet!20] { node[concept] {Data Owner} }
+        child[concept color=violet!20] { node[concept] {Data Owner} };
+    \end{tikzpicture}
     \caption{The actors in the data economy.}
     \label{fig:DataActors}
 \end{figure*}
