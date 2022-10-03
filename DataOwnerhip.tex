@@ -52,12 +52,16 @@ access the data did so safely.
 In an information economy, data is the most fundamental commodity there is. To understand the individualized data economy, we must highlight the difference between assets 
 and commodities. While commodities are an asset class, they have unique properties. Unlike most other asset classes, commodities are traded at high volume. While it is 
 possible to purchase small volumes of commodities, they are often illiquid due to the markets operating at high volumes. While fractional vehicles like ETFs do exist, 
-these are fundamentally not equivalent, as they represent nothing more than a symbolic debt obligation and not the resource itself. For example, it is possible to buy 
+these are fundamentally not equivalent, as they represent a symbolic debt obligation and not the resource itself. For example, it is possible to buy 
 an individual gallon of oil but much harder to sell it as the markets do not trade oil by the gallon. Conversely, it is much easier to sell a thousand barrels of the 
 same oil since the commodities markets trade at these quantities regularly. In much the same way, individual data is not valuable in today's data economy and is almost 
-exclusively traded in the aggregate.
+exclusively handled in the aggregate.
 
-There are cases in which individualized markets have developed around commodities. For example, in the wake of the 2008 financial crisis, consumers rushed to purchase gold as trust in financial assets, currencies, and markets plummeted. Nations and banks often trade in gold in large quantities, and as a result, gold markets trade-in units ranging from the thousands to the millions. To facilitate the liquidity of consumer gold, several gold purchasing operations have sprung up to provide liquidity to the individual and aggregate gold for commodities markets. Because of the non-triviality of data ownership (see below), this infrastructure has yet to be created for data. This is what the Snickerdoodle protocol aims to enable.
+There are cases in which individualized markets have developed around commodities. For example, in the wake of the 2008 financial crisis, consumers rushed to purchase gold 
+as trust in financial assets, currencies, and markets plummeted. Nations and banks often trade in gold in large quantities, and as a result, gold markets trade-in units 
+ranging from the thousands to the millions of ounces. To facilitate the liquidity of consumer gold, several gold purchasing operations have sprung up to provide liquidity to the 
+individual and aggregate gold for commodities markets. Because of the non-triviality of data ownership (see below), this infrastructure has yet to be created for data. 
+This is what the Snickerdoodle Protocol aims to enable.
 
 
 \subsubsection{Utility of Data}
@@ -67,19 +71,27 @@ There are cases in which individualized markets have developed around commoditie
 %.      How can people get value
 %       How can businesses get value
 
-Data provides so much utility in the twenty-first century and has revolutionized every industry from supply chain to medicine, biotech, sports, and self-driving cars. Some of this involves insane computing, such as using machine learning to generate human faces and stories, to less complex tasks like finding the quickest route home. There is also a dark side to this, as all this data allows for complex and automated ways to track people. (MORE CITATIONS). 
+Large scale data analysis has provided great utility in the twenty-first century and has revolutionized every industry from supply chain to medicine, 
+biotech, sports, and self-driving cars. Most of these applications require substantial computational resources, such as using machine learning to 
+generate human faces and stories, to less complex tasks like finding the quickest route home. This also leads to undesirable outcomes such as 
+tracking individuals without their knowledge or consent. 
 
-We find that the utility of data comes from the ability the analyze data to generate $\mathit{insights}$. These insights help us understand the world and allow us to make more informed actions. E.g., Google uses my search history to learn what I like and give a relevant ad. A self-driving car analyzes data from its sensors to learn that the traffic light turned red and it should stop.
+The utility of data comes from the ability to analyze it and and produce $\mathit{insights}$, see \ref{definition:Insight}. Insights represent actionable intelligence 
+derived from a data set. As an example, Google uses an individual's search history to learn a preference so that a relevant advertisement may be served. A self-driving 
+car analyzes data from its sensors to learn that the traffic light turned red and it should stop.
 
 \subsubsection{An individual's role in the data economy} 
 %TODO moving this to the top bc I think it'll help if flow better -- not sure where on the top it fits the best
 % What is the role of an individual right now?
 % Looking at the flow how can an individual's role be expanded
-The problem with the current data economy is that the individual generating the data doesn't have control over how their data is being used and isn't being properly compensated for their role in the data economy. Different governments recognize the need to give users control, such as the GDPR and CCPA (CITE THINGS + maybe more info). While the data economy is said to be valued around XXX at the time of writing (CITE), individuals aren't getting their fair share of this pie. (NEED MORE CITATIONS -- maybe Kara Swisher cheap date, also need harder sources). 
-\newline
-\newline
-Another problem is that the lack of ownership and control of data leads to ways for governments to get around surveillance laws. Instead of getting a warrant to view individual data, governments can buy the data from data brokers (CITE). This creates an opaque way for governments to spy on individuals. For example, the US government's ICE agency created an extensive database through publicly available information and data brokers that allow them to track everyone in the US without a warrant (CITE). 
 
+While the data economy is said by the World Economic Forum to be valued around $3 trillion at the time of writing, the primary lack of incentive alignment 
+in the modern data economy is that individual generating data do not have control over how their data is being used and is not compensated for their role 
+in the data economy. Different governments recognize the need to give users control, such as the GDPR and CCPA. 
+ Another problem is that the lack of ownership and control of data leads to ways for governments to get around surveillance laws. Instead 
+of getting a warrant to view individual data, governments can buy the data from data brokers. This creates an opaque way for governments to spy on individuals. 
+For example, the U.S. government’s ICE agency created an extensive database through publicly available information and data brokers that allow them to track 
+everyone in the U.S. without a warrant.
 
 % Due to how tricky it is to define data ownership, our protocol focuses on allowing users to control data they they generate. Specifically we want to enable a protocol that gives users to safely managed how their data is collected, stored, and shared. Additionally, parties that are interested in subscribing to individual's data can do so without compromising the safety of that data. The protocol should also maintain the authenticity and interoperability of data to ensure that the data being process is valid and usable.
 
@@ -90,10 +102,14 @@ Another problem is that the lack of ownership and control of data leads to ways 
 
 \subsubsection{Properties of Data}
 % trying italic special sections not sure if it works
-It's worth highlighting that when data is treated as an asset, the value of the data asset can depend on the properties of that data. The $\mathit{utility}$ of the insights that data can provide will dictate how valuable the data is. $\mathit{Privacy}$ of the data is vital in creating value out of data. If data isn't private, there's no scarcity of data, and the asset is worth less. Worse, the lack of privacy incentives enables mass surveillance.
-Similarly, $\mathit{security}$ is deeply tied to the value of data as an asset. Data that isn't secure can easily be stolen or can be rendered unusable. 
-Data should be $\mathit{interoperable}$, so it can be used across many platforms. If my data is in a proprietary format or can't be moved outside of a particular system, there's less demand for the data. 
-There also needs to be ways to gauge the $\mathit{authenticity}$ of the data. If the data can easily be faked, then the data is worth less.
+
+It's worth highlighting that when data is treated as an asset, the value of the data asset can depend on the properties of that data. The $\mathit{utility}$ of 
+the insights that data can provide will dictate how valuable the data is. $\mathit{Privacy}$ of the data is vital in creating value out of data. If data is not private, 
+then there no property of scarcity. An asset without scarcity is worthless. Worse, the lack of privacy incentives enables mass surveillance.
+Similarly, $\mathit{security}$ is deeply tied to the value of data as an asset. Data that is not secure can easily be stolen or can be rendered unusable. 
+Data should be $\mathit{interoperable}$, so it can be used across many platforms. If a user's data is encoded via a proprietary format or cannot be moved outside 
+of a particular silo, there will be less demand for the data set. Mechanisms to fascilitate the $\mathit{authenticity}$ of data are also required. If the data can 
+easily be faked or modified, then the insights derived from the data set become uncertain.
 
 
 % good points I had to delete:
@@ -116,31 +132,50 @@ There also needs to be ways to gauge the $\mathit{authenticity}$ of the data. If
 %.    Break down into personas
 %.    Break down how data flows
 
-The data economy is a complex system that collects data on individuals, shares that data with other actors, and runs analysis on that data. This flow is necessary to extract value from data. The people generating the data don't necessarily have a good way to take advantage of their data, and those interested in the data don't generate it. This dynamic is at the heart of the data economy. One group generates the data, and the other wants to gain insight from that data. The rest of the actors exist to provide infrastructure to support that dynamic. This flow can be seen in figure \ref{fig:DataActors}.
-
-
-\subsubsection{Actors}
-We define the generator of the data as the $\mathit{owner}$ and the actor who is interested in the data as the $\mathit{subscriber}$. Being the entity that creates the data, the owner should have ownership rights and thus control how their data is used. The subscriber is interested in gaining temporary access to that data and running an $\mathit{application}$ on a large amount of data to learn insights and use those insights to take specific actions. It's worth highlighting that, in our definition, the subscriber is only interested in the utility of the data, not the data itself.
-
-
-Other actors in the economy provide the infrastructure. $\mathit{Collectors}$ are the actors who monitor and collect data on owners. $\mathit{Custodians}$ store that data. Because the utility of data increases when combined with other data, the $\mathit{aggregator}$ aggregates data from different custodians and makes it easy to run applications to generate insights.
-
-
-Subscribers pay for the utility, and that payment flows back down through the economy. Also, note that the same entity can play multiple roles. E.g. Google is a collector, custodian, aggregator, application, and subscriber for ads on web searches. Subscribers pay Google to run an application that analyzes people and gives ads to those they think are interested in the subscriber's product. Data owners are the people using Google search. They are getting back a free online search and pay Google by seeing ads and allowing Google to control the data.
-
-
-For this to be a self-sovereign data economy, the data owner must own their data and thus control how it is used. The owner must be able to easily manage the collection, storage, aggregation, and applications that run on their data. Additionally, payment must be distributed equitably to the parties in this economy such that the owner gets their fair share and all the actors have an incentive to behave.
-
-TODO UPDATE FIGUTE TO SHOW ACTORS AND SNICKERDOODLE ACTORS
 \begin{figure*}[!htbp] 
     \centering
-    % \textbf{a.}
-    \includegraphics[width=170]{images/persona_strucutre.jpg}
-    \caption{The flow of data in the data economy. The data is generated by the owner and flows from collectors to custodians to aggregators to applications and finally to the subscriber. The subscriber pays money that trickles back through the system. In order for the owner to actually have ownership of their data they must be able to manage the collector, custodian, and aggregator of their data.}
+    \begin{tikzpicture}
+        \path[mindmap,concept color=black,text=white]
+          node[concept] {Data Economy}
+          [clockwise from=0]
+          child[concept color=green!50!black] {
+            node[concept] {Data Collectors}
+            [clockwise from=90]
+            child { node[concept] {Custodian} }
+            child { node[concept] {Aggregator and Analyzer} }
+            child { node[concept] {Subscriber} }
+          }  
+          child[concept color=orange] { node[concept] {Data Owner} }
+          child[concept color=orange] { node[concept] {Data Owner} };
+      \end{tikzpicture}
+    \caption{The actors in the data economy.}
     \label{fig:DataActors}
 \end{figure*}
 
+The data economy is a complex system that collects data on individuals, shares that data with other actors, and runs analysis on that data. This flow is 
+necessary to extract value from data. Individuals generating the data sets do not necessarily have a good way to take advantage of their data, and those interested 
+in the data are not the entities that generate it. This dynamic is at the heart of the data economy. One group generates the data, and the other wants to gain 
+insight from that data. The rest of the actors exist to provide infrastructure to support that dynamic.
 
+\subsubsection{Actors}
+
+We define the generator of the data as the $\mathit{owner}$ and the actor who is interested in the data as the $\mathit{subscriber}$. Being the entity that 
+creates the data, the owner should have ownership rights and thus control how their data is used. The subscriber is interested in gaining temporary access 
+to that data and running an $\mathit{algorithm}$ or $\mathit{functional transformation}$ on a large data set to gain actionable intelligence. It's worth 
+highlighting that, in our definition, the subscriber is only interested in the utility of the information embedded in the data, not the data itself.
+
+Other actors in the economy provide the infrastructure. $\mathit{Collectors}$ are the actors who monitor and collect data on owners. $\mathit{Custodians}$ 
+store that data. Because the utility of data increases when combined with other data, the $\mathit{aggregator}$ aggregates data from different custodians 
+and makes it easy to run analysis, or algorithms to generate insights.
+
+Subscribers pay for the utility, and that payment flows back down through the economy. Also, note that the same entity can play multiple roles. E.g. Google 
+is a collector, custodian, aggregator, and subscriber for ads on web searches. Subscribers pay Google to run an algorithm that analyzes people 
+and gives ads to those they think are interested in the subscriber's product. Data owners are the people using Google search. They are getting back a free 
+online search and pay Google by seeing ads and allowing Google to control the data.
+
+A self-sovereign data economy requires the data owner must own their data and control how it is used. The owner must have granular control over the 
+the collection, storage, aggregation, and algorithms that run on their data. Additionally, payment must be distributed equitably to the parties in this 
+economy such that incentives amongst all actors are aligned.
 
 \subsubsection{Actors in the Snickerdoodle Protocol}
 % For our version 1 how are we going to break down the actors/personas
@@ -148,7 +183,11 @@ TODO UPDATE FIGUTE TO SHOW ACTORS AND SNICKERDOODLE ACTORS
 %.    Businesses
 %     DAO
 %.    SDL
-We will simplify the actors for the initial version of the Snickerdoodle Protocol. The users of the protocol are data owners who will collect, store, and manage their data from a $\mathit{data wallet}$ (for more on data wallet, see \ref{section:DataWallet}). The data wallet will allow people to consent to aggregation and allow certain applications to run on their data by minting a non-transferable consent NFT (to learn more about the on-chain aggregation\&consent architecture and the applications, see sections \ref{section:Contracts} and \ref{section:SDQL} respectively). Lastly, consenting data wallets will send the resulting insights to an ingestion provider, which will allow businesses to see the insights they have paid for (see \ref{section:InsightService}). 
+We will simplify the actors for the initial version of the Protocol. The users of the protocol are data owners who will collect, store, 
+and manage their data from a $\mathit{data wallet}$ (for more on data wallet, see \ref{section:DataWallet}). The data wallet will allow people to 
+provide auditable consent to aggregation and allow certain algorithms or functional transformations to run on their data set by minting a non-transferable consent NFT 
+(to learn more about the on-chain aggregation\&consent architecture and the applications, see sections \ref{section:Contracts} and \ref{section:SDQL} respectively). 
+Lastly, consenting data wallets will send the resulting anonymized insights to an aggregation provider, which will allow businesses to see the insights they have paid 
+for (see \ref{section:InsightService}). 
 
-
-For implementation details check out section \ref{section:Implementation} and for ways we'll expand the protocol in the future check out section \ref{section:Future}.
+Implementation details are given in section \ref{section:Implementation} with areas for future improvement given in section \ref{section:Future}.
