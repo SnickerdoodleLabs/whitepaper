@@ -1,0 +1,86 @@
+\begin{figure*}[!htbp] 
+    \centering
+    \tikzset{
+    state/.style={
+           rectangle,
+           rounded corners,
+           draw=black, very thick,
+           minimum height=2em,
+           inner sep=2pt,
+           text centered,
+           },
+}
+
+\begin{tikzpicture}[->,>=stealth']
+
+ % Position of QUERY 
+ % Use previously defined 'state' as layout (see above)
+ % use tabular for content to get columns/rows
+ % parbox to limit width of the listing
+ \node[state,
+ anchor=center] (DATA WALLET) 
+ {\begin{tabular}{l}
+  \textbf{Data Wallet}\\
+  \parbox{7cm}{
+  Web3 Invitation Popup Protocol
+  \begin{enumerate}
+   \item 1. Detect Environment State Change
+   \item 2. Scan for contract address tag
+   \item 3. Read URIs from contract
+   \item 4. Assert tag/URI aggreement
+   \item 5. Trigger Invitation on successful assert
+  \end{enumerate}
+  }\\[5em]
+ \end{tabular}};
+  
+ % State: ENV with different content
+ \node[state,    	% layout (defined above)
+  text width=7cm, 	% max text width
+  above of=DATA WALLET, 	% Position is to the right of QUERY
+  node distance=6.5cm, 	% distance to QUERY
+  ] (ENV) 	% posistion relative to the center of the 'box'
+ {%
+ \begin{tabular}{l} 	% content
+  \textbf{Environment State (Off-Chain)}\\
+  \parbox{7cm}{
+  Contract tag examples:
+   \begin{enumerate}
+     \item 1. TXT Record (web/mobile browser env)
+     \item 2. Meta tag (web/mobile browser env)
+     \item 3. hidden file (native app env)
+     \item 4. application event (native/browser env)
+  \end{enumerate}
+  }
+ \end{tabular}
+ };
+ 
+ % STATE CONTRACT
+ \node[state,
+  right of=ENV,
+  node distance=9.5cm,
+  text width=6cm] (CONTRACT) 
+ {%
+ \begin{tabular}{l}
+  \textbf{Consent Contract (On-Chain)}\\
+  \parbox{6cm}{
+  On-Chain URI examples:
+      \begin{enumerate}
+        \item 1. Web URL
+        \item 2. application signature
+      \end{enumerate}
+  }
+ \end{tabular}
+ };
+
+
+ % draw the paths and and print some Text below/above the graph
+ \path (DATA WALLET) 	edge[bend left=20]  node[anchor=west,left]{$1$} (ENV)
+ (ENV) 	edge[bend left=20]  node[anchor=east,right]{$2$} (DATA WALLET)
+ (DATA WALLET)     	edge[bend left=20] node[anchor=west,left]{$3$} (CONTRACT)
+ (CONTRACT)     	edge[bend left=20] node[anchor=east,right]{$4$} (DATA WALLET)
+ (DATA WALLET) 	edge[bend right=30]  node[anchor=east,right]{$5$} (ENV);
+
+\end{tikzpicture}
+    \caption{Actor model of the tamper-resistant web3 invitation popup protocol.}
+    \label{fig:PopupProtocol}
+  \end{figure*}

@@ -1,7 +1,5 @@
 \section{Implementation}
 \label{section:Implementation}
-TODO FIGURE SHOWING OVERALL FLOW
-        may want to have additional images of wallet
 
 % High-level overview
 
@@ -9,13 +7,22 @@ TODO FIGURE SHOWING OVERALL FLOW
 %   - how does data move?
 %   Query publishing -> processing -> endpoint called -> data ingestion
 
-This section will discuss the initial implementation and design decisions of the Snickerdoodle protocol. The protocol has three primary components: data wallet, consent contracts, and data ingestion providers.
+This section will discuss the initial implementation and design decisions of the Protocol. The Protocol has three primary 
+components: data wallet, consent contracts, and aggregation service providers.
 
-At a high level, the data wallet will allow people to collect and store their data and participate in the Snickerdoodle Network. Businesses will be able to query this data by creating consent contracts and submitting SDQL queries. Data wallets will receive these queries and follow their instructions to run computations on their data to create insights. Once a data wallet receives a reward from the business, it will send that insight to a data ingestion service for the business to see. TODO add diagram
+At a high level, the data wallet is a piece of software that will allow people to collect and store their data and participate 
+in the Snickerdoodle Network. Businesses will be able to query this data by creating consent contracts and submitting SDQL queries. 
+Data wallets will receive these queries and follow their instructions to run computations on their data to create insights. Once a 
+data wallet receives a reward from the business, it will send that insight to a data ingestion service for the business to see. 
 
-This flow will be orchestrated in a distributed manner by the Snickerdoodle Protocol. Consent contracts will manage user consent and data requests. These contracts are created by businesses and facilitate consent by issuing non-transferable consent tokens. The protocol is governed and managed by the Snickerdoodle DAO. 
+This flow will be orchestrated in a distributed manner by the Protocol. Consent contracts will manage user consent 
+and data requests. These contracts are created by businesses and facilitate consent by issuing non-transferable consent tokens. 
+The protocol is governed and managed by the Protocol DAO. 
 
-It is also worth highlighting that while Snickerdoodle Labs will be providing service infrastructure for the protocol (such as making a data wallet and a SaaS product offering for enterprise participation in the protocol), the protocol itself is permissionless and anyone could act as a data ingestion provider if the protocol is followed properly. Data ingestion is simply another role for any actor within the system to assume.
+It is also worth highlighting that while Snickerdoodle Labs will be providing service infrastructure for the protocol (such as 
+making a data wallet and a SaaS product offering for enterprise participation in the protocol), the protocol itself is 
+permissionless and anyone could act as a data ingestion provider if the protocol is followed properly. Data ingestion is 
+simply another role for any actor within the system to assume.
 
 \subsection{Data wallet}
 \label{section:DataWallet}
@@ -24,7 +31,7 @@ It is also worth highlighting that while Snickerdoodle Labs will be providing se
 %.     in a safe fashion
 %
 
-\input{DataWalletStructureTiks}
+\input{DataWalletStructureTikz}
 
 The data wallet is the primary end-user client interface within the Snickerdoodle protocol. It enables data ownership by helping the user control and consent to the collection, storage, and usage of their data. The data wallet will facilitate this by providing the following functionality:
 \begin{itemize}
@@ -199,6 +206,20 @@ The distributed runtime library is a core security feature of the data wallet. T
 %   - Registry itself has access control so DAO is only one who can add and remove 
 The DAO will maintain an allowlist of authorized plugins determined by governance. This allowlist will ensure that accepted logic is determined by the token holders and enforce the integrity of those plugins at the execution level. The DAO is based on Compound Finance's DAO and built using OpenZeppelin libraries. The certificate registry will be implemented as an ERC-721 contract where the token URI holds the checksum and domain name. The DAO will be the only party authorized to modify this registry. See section \ref{section:TokenDAO} for more details on the DAO.
 %reference DAO
+
+\subsection{Tamper Resistant Web3 Invitation Popups}
+\label{section:Web3Popus}
+
+\include{Web3PopupTikz}
+
+The protocol allows for the decentralized, trustless, and tamper-resistant detection of events that should be presented to the data wallet 
+end user in a format appropriate for the environment. In a web browser setting, the data wallet detects the current active URL, and via DNS 
+over HTTPS (DoS) queries the TXT records associated with the apex domain. If the TXT record contains a reference to a protocol consent 
+contract address, the data wallet then fetches the active domains from that contract on the blockchain and cross-references the domains 
+listed from the contract to the current URL. If the data wallet detects that the current URL is included in the domains listed in the 
+consent contract, the data wallet will inject a popup into the browser DOM. The content of the popup is fetched from an appropriate content 
+addressable network (such as IPFS) and the content address is given by the consent contract baseURI. The Web3 popup protocol can be 
+extended to other environments including mobile browsing environments, VR experiences, gaming consoles, etc. 
 
 \subsection{Consent Contracts} % This kinda feels like current web3 component
 \label{section:Contracts}
