@@ -56,7 +56,7 @@
  
  % STATE CONTRACT
  \node[state,
-  right of=ENV,
+  right of=DATA WALLET,
   node distance=9.5cm,
   text width=6cm] (CONTRACT) 
  {%
@@ -76,8 +76,8 @@
  % draw the paths and and print some Text below/above the graph
  \path (DATA WALLET) 	edge[bend left=20]  node[anchor=west,left]{$1$} (ENV)
  (ENV) 	edge[bend left=20]  node[anchor=east,right]{$2$} (DATA WALLET)
- (DATA WALLET)     	edge[bend left=20] node[anchor=west,left]{$3$} (CONTRACT)
- (CONTRACT)     	edge[bend left=20] node[anchor=east,right]{$4$} (DATA WALLET)
+ (DATA WALLET)     	edge[bend left=20] node[anchor=north,above]{$3$} (CONTRACT)
+ (CONTRACT)     	edge[bend left=20] node[anchor=south,below]{$4$} (DATA WALLET)
  (DATA WALLET) 	edge[bend right=30]  node[anchor=east,right]{$5$} (ENV);
 
 \end{tikzpicture}
