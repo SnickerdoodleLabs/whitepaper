@@ -1,0 +1,51 @@
+\begin{figure*}[!htbp] 
+    \centering
+    % Define block styles
+    \tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+        text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+    \tikzstyle{factoryblock} = [rectangle, draw, fill=blue!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{actorblock} = [rectangle, draw, fill=green!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{contract} = [circle, draw, fill=violet!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{aggregator} = [cylinder, 
+        draw = violet, 
+        text = purple,
+        cylinder uses custom fill, 
+        cylinder body fill = magenta!10, 
+        cylinder end fill = magenta!40,
+        aspect = 0.2, 
+        shape border rotate = 90]
+    \tikzstyle{line} = [draw, -latex']
+    \tikzstyle{onchain} = [draw=blue!50, thick, fill=blue!10, rounded corners, rectangle, text width=7em, text centered]
+    \tikzstyle{offchain} = [draw=blue!50, thick, fill=red!10, rounded corners, rectangle, text width=7em, text centered]
+    
+    \begin{tikzpicture}[node distance = 2cm, auto]
+        % Place nodes
+        \node [factoryblock,  node distance=5cm] (FACTORY) {Consent Contract Factory};
+        \node [contract, below of=FACTORY,  node distance=4cm] (CONTRACT) {Consent Contract};
+        \node [aggregator, below of=CONTRACT,  node distance=3.5cm] (AS) {Aggregator Service};
+        \node [actorblock, right of=AS,  node distance=6cm] (DW) {Data Wallet};
+        \node [actorblock, left of=AS,  node distance=6.5cm] (IC) {Insight Consumer};
+        % Draw edges
+        \path [line] (IC) |- node [near end, below] {publish contract} (FACTORY);
+        \path [line] (IC) |- node [near end] {request for data event} (CONTRACT);
+        \path [line] (DW) |- node [near end, above] {opt in} (CONTRACT);
+        \path [line] (FACTORY) -- node {deploy} (CONTRACT);
+        \path [line] (DW) -- node [above] {insight delivery} (AS);
+        \path [line] (IC) -- node {insight visualization} (AS);
+        % On-Chain Box
+        \begin{pgfonlayer}{background}
+          \node[onchain, label={On-Chain}] [fit = (FACTORY) (CONTRACT)] {};
+        \end{pgfonlayer}
+        % Off-chain Box
+        \begin{pgfonlayer}{background}
+          \node[offchain, label={Off-Chain}] [fit = (IC) (AS) (DW)] {};
+        \end{pgfonlayer}
+    \end{tikzpicture}
+    \caption{Insight consumers reach data wallet users by broadcasting events from a consent contract instance. Only data wallets that have
+    claimed a non-transferrable consent token listen for events nad deliver insights to the aggregation service URL listed in the associated
+    request-for-data event.}
+    \label{fig:OnChainOffChain}
+  \end{figure*}

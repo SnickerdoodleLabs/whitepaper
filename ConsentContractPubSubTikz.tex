@@ -1,0 +1,33 @@
+\begin{figure*}[!htbp] 
+    \centering
+    % Define block styles
+    \tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+    \tikzstyle{daoblock} = [diamond, draw, fill=red!20, 
+    text width=6em, text centered, rounded corners, minimum height=4em] 
+    \tikzstyle{factoryblock} = [rectangle, draw, fill=blue!20, 
+    text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{instance} = [circle, draw, fill=violet!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{line} = [draw, -latex']
+    \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+        minimum height=2em]
+    
+    \begin{tikzpicture}[node distance = 2cm, auto]
+        % Place nodes
+        \node [daoblock] (DAO) {Protocol DAO};
+        \node [factoryblock, right of=DAO,  node distance=5cm] (FACTORY) {Consent Contract Factory};
+        \node [instance, right of=FACTORY,  node distance=4cm] (CONTRACT2) {Consent Contract 2};
+        \node [instance, above of=CONTRACT2,  node distance=4cm] (CONTRACT1) {Consent Contract 1};
+        \node [instance, below of=CONTRACT2,  node distance=4cm] (CONTRACT3) {Consent Contract ...};
+        % Draw edges
+        \path [line] (DAO) -- node {upgrade} (FACTORY);
+        \path [line] (FACTORY) |- node [near start] {deploy} (CONTRACT1);
+        \path [line] (FACTORY) -- node {deploy} (CONTRACT2);
+        \path [line] (FACTORY) |- node [near start] {deploy} (CONTRACT3);
+    \end{tikzpicture}
+    \caption{The core of the on-chain protocol effectively implements an upgradeable, decentralized pub-sub 
+    network. Insight consumers publish consent contracts via the consent contract factory and end-users subscribe 
+    to consent contracts by claiming a non-transferable consent token.}
+    \label{fig:ConsentFactory}
+  \end{figure*}

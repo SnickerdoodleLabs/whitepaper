@@ -10,10 +10,18 @@
 This section will discuss the initial implementation and design decisions of the Protocol. The Protocol has three primary 
 components: data wallet, consent contracts, and aggregation service providers.
 
+\include{ConsentContractPubSubTikz}
+
 At a high level, the data wallet is a piece of software that will allow people to collect and store their data and participate 
-in the Snickerdoodle Network. Businesses will be able to query this data by creating consent contracts and submitting SDQL queries. 
+in the decentralized data network. Organizations (insight consumers) will be able to query this through an on-chain publish-subscribe (pub-sub)
+protocol (see fig. \ref{fig:ConsentFactory}). An upgradable contract factory is used to produced instances of an EIP-721 compatible consent contract.
+Tokens claimed from these consent contracts are non-transferrable, but can be burned by the recipient. Claiming a token
+
+data by creating consent contracts and submitting SDQL queries. 
 Data wallets will receive these queries and follow their instructions to run computations on their data to create insights. Once a 
 data wallet receives a reward from the business, it will send that insight to a data ingestion service for the business to see. 
+
+\include{OnChainOffChainInteractionTikz}
 
 This flow will be orchestrated in a distributed manner by the Protocol. Consent contracts will manage user consent 
 and data requests. These contracts are created by businesses and facilitate consent by issuing non-transferable consent tokens. 
