@@ -23,7 +23,7 @@
         % Draw edges
         \path [line] (DAO) -- node {upgrade} (FACTORY);
         \path [line] (FACTORY) |- node [near start, right] {deploy} (CONTRACT1);
-        \path [line] (FACTORY) -- node {deploy, above} (CONTRACT2);
+        \path [line] (FACTORY) -- node [above] {deploy} (CONTRACT2);
         \path [line] (FACTORY) |- node [near start, right] {deploy} (CONTRACT3);
     \end{tikzpicture}
     \caption{The core of the on-chain protocol effectively implements an upgradeable, decentralized pub-sub 
