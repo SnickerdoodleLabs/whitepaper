@@ -13,24 +13,23 @@ components: data wallet, consent contracts, and aggregation service providers.
 \include{ConsentContractPubSubTikz}
 
 At a high level, the data wallet is a piece of software that will allow people to collect and store their data and participate 
-in the decentralized data network. Organizations (insight consumers) will be able to query this through an on-chain publish-subscribe (pub-sub)
-protocol (see fig. \ref{fig:ConsentFactory}). An upgradable contract factory is used to produced instances of an EIP-721 compatible consent contract.
-Tokens claimed from these consent contracts are non-transferrable, but can be burned by the recipient. Claiming a token
+in the decentralized data network, see section \ref{section:DataWallet}. Organizations (consumers of data insights) will be able 
+to query groups of data wallets through an on-chain publish-subscribe (pub-sub) protocol (see fig. \ref{fig:ConsentFactory}). 
 
-data by creating consent contracts and submitting SDQL queries. 
-Data wallets will receive these queries and follow their instructions to run computations on their data to create insights. Once a 
-data wallet receives a reward from the business, it will send that insight to a data ingestion service for the business to see. 
+An upgradable contract factory is used to produced instances of an EIP-721 compatible consent contract. Tokens claimed from these 
+consent contracts are non-transferable, but can be burned by the recipient. Claiming a token denotes a data wallet user's consent 
+to participate in network queries in return for rewards (which may or may not be web3 digital assets). Data wallets will receive 
+these queries and follow their instructions (written in SDQL) to run computations on their data to produce insights. Once a data 
+wallet receives a reward from the business, it will send that insight to an aggregation service for the business to visualize, see 
+figure \ref{OnChainOffChain}. 
 
 \include{OnChainOffChainInteractionTikz}
 
-This flow will be orchestrated in a distributed manner by the Protocol. Consent contracts will manage user consent 
-and data requests. These contracts are created by businesses and facilitate consent by issuing non-transferable consent tokens. 
-The protocol is governed and managed by the Protocol DAO. 
-
-It is also worth highlighting that while Snickerdoodle Labs will be providing service infrastructure for the protocol (such as 
-making a data wallet and a SaaS product offering for enterprise participation in the protocol), the protocol itself is 
-permissionless and anyone could act as a data ingestion provider if the protocol is followed properly. Data ingestion is 
-simply another role for any actor within the system to assume.
+User consent and data flow is thus orchestrated in a distributed manner by the Protocol. It is also worth highlighting that while 
+Snickerdoodle Labs will develop service infrastructure for the protocol (such as producing a data wallet and a SaaS product offering 
+for enterprise participation in the protocol), the protocol itself is, however, permissionless and open so that anyone could act as 
+an aggregation service provider if the protocol is adhered to. Aggregation and data visualization is simply another role for any 
+actor within the system to assume.
 
 \subsection{Data wallet}
 \label{section:DataWallet}
@@ -41,18 +40,19 @@ simply another role for any actor within the system to assume.
 
 \input{DataWalletStructureTikz}
 
-The data wallet is the primary end-user client interface within the Snickerdoodle protocol. It enables data ownership by helping the user control and consent to the collection, storage, and usage of their data. The data wallet will facilitate this by providing the following functionality:
+\input{InsightControlFLowTikz}
+
+The data wallet is the primary end-user client interface within the Snickerdoodle protocol. It enables data ownership by facilitating user control 
+and consent to the collection, storage, and usage of their data. The data wallet should provide the following functionality:
 \begin{itemize}
   \item Secure storage of the data
-  \item A collection engine for individualized data mining
-  \item Aggregation of implicit and external data. This aggregation could include the aggregation of on-chain data, data from third-party sources, or digital identities.
-  \item A consent management interface
-  \item Localized data processing and submission
+  \item A query engine for individualized data mining
+  \item Aggregation and indexing of user data. This should include on-chain data, data from traditional third-party sources, or digital identities.
+  \item A consent management interface for granular access control
+  \item Localized insight processing and submission
   \item Reward discovery and management
-  \item Identity Management
+  \item Identity and verifiable credential management
 \end{itemize}
-
-\input{InsightControlFLowTikz}
 
 % Overview
 %   Control over-collection and storage -- ownership
@@ -63,13 +63,13 @@ The data wallet is the primary end-user client interface within the Snickerdoodl
 %       - Aggregation of implicit and external data (ID card metaphor) -- adding example
 %           - DID
 %       - Consent manager
-%   Summary of exactly what the wallet does
+%   Summary of exactly what the wallet does6
 
-
-
-To the user, the data wallet operates in a conceptually similar way to a conventional cryptocurrency wallet, but with a wider scope. Instead of key and account data management, a data wallet manages the storage, collection, and sharing of all user data. The initial form factor will be a browser extension with plans to expand the form factor in future versions (see section \ref{section:FormFactor}). By providing this localized control interface, the data wallet will give individuals greater control of their own data and allow for participation in the Snickerdoodle protocol.
-
-(TODO add a figure here illustrating form factor)
+To the user, the data wallet operates in a conceptually similar way to a conventional cryptocurrency wallet, but with a wider scope. 
+Instead of key and account management of a blockchain account, a data wallet manages the storage, collection, and sharing of insights derived 
+from user data. The initial form factor will be a stand-alone browser extension with plans to expand the form factor in future versions (see 
+section \ref{section:FormFactor}). By providing this localized control interface, the data wallet will give individuals greater control 
+of their own data and allow for participation in the Protocol.
 
 % rest is how wallet does it 
 %   - traditional crypto wallet form factor -- picture if we have design
@@ -93,7 +93,11 @@ To the user, the data wallet operates in a conceptually similar way to a convent
 %       -Use indexer to find queries
 %       -(future) in-browser event capturing
 %   Verified / third party data (future)
-Secure storage of data is crucial to allowing people to own their data. Our initial implementation will use a simple in-memory database of key-value pairs using the browser's local storage. In the future, we will use more sophisticated alternatives such as indexDB as the performance needs of the application scales. It is also important to call out the wallet's storage of keys. For the initial version, we are only storing users' public keys and digital signatures in the data wallet, not private keys. Instead, we integrate with existing wallets (e.g., MetaMask) for key management.
+Secure storage of data is crucial to allowing people to own their data. Our initial implementation will use a simple in-memory 
+database of key-value pairs using the browser's local storage. In the future, we will use more sophisticated alternatives such 
+as indexDB as the performance needs of the application scales. It is also important to call out the wallet's storage of keys. 
+For the initial version, we are only storing users' public keys and digital signatures in the data wallet, not private keys. 
+Instead, we integrate with existing wallets (e.g., MetaMask) for key management.
 
 
 \subsubsection{Collection}

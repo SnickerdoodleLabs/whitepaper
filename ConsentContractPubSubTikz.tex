@@ -18,13 +18,13 @@
         \node [daoblock] (DAO) {Protocol DAO};
         \node [factoryblock, right of=DAO,  node distance=5cm] (FACTORY) {Consent Contract Factory};
         \node [instance, right of=FACTORY,  node distance=4cm] (CONTRACT2) {Consent Contract 2};
-        \node [instance, above of=CONTRACT2,  node distance=4cm] (CONTRACT1) {Consent Contract 1};
-        \node [instance, below of=CONTRACT2,  node distance=4cm] (CONTRACT3) {Consent Contract ...};
+        \node [instance, above of=CONTRACT2,  node distance=3cm] (CONTRACT1) {Consent Contract 1};
+        \node [instance, below of=CONTRACT2,  node distance=3cm] (CONTRACT3) {Consent Contract ...};
         % Draw edges
         \path [line] (DAO) -- node {upgrade} (FACTORY);
-        \path [line] (FACTORY) |- node [near start] {deploy} (CONTRACT1);
-        \path [line] (FACTORY) -- node {deploy} (CONTRACT2);
-        \path [line] (FACTORY) |- node [near start] {deploy} (CONTRACT3);
+        \path [line] (FACTORY) |- node [near start, right] {deploy} (CONTRACT1);
+        \path [line] (FACTORY) -- node {deploy, above} (CONTRACT2);
+        \path [line] (FACTORY) |- node [near start, right] {deploy} (CONTRACT3);
     \end{tikzpicture}
     \caption{The core of the on-chain protocol effectively implements an upgradeable, decentralized pub-sub 
     network. Insight consumers publish consent contracts via the consent contract factory and end-users subscribe 
