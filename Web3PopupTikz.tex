@@ -1,4 +1,4 @@
-\begin{figure*}[!htbp] 
+\begin{figure*}[!ht] 
     \centering
     \tikzset{
     state/.style={
@@ -18,69 +18,69 @@
  % use tabular for content to get columns/rows
  % parbox to limit width of the listing
  \node[state,
- anchor=center] (DATA WALLET) 
- {\begin{tabular}{l}
-  \textbf{Data Wallet}\\
-  \parbox{7cm}{
-  Web3 Invitation Popup Protocol
-  \begin{enumerate}
-   \item Detect Environment State Change
-   \item Scan for contract address tag
-   \item Read URIs from contract
-   \item Assert tag/URI aggreement
-   \item Trigger Invitation on successful assert
-  \end{enumerate}
-  }\\[5em]
- \end{tabular}};
+  anchor=center] (DATA WALLET) 
+  {\begin{tabular}{l}
+    \textbf{Data Wallet}\\
+    \parbox{7cm}{
+    Web3 Invitation Popup Protocol
+    \begin{enumerate}
+    \item Detect Environment State Change
+    \item Scan for contract address tag
+    \item Read URIs from contract
+    \item Assert tag/URI aggreement
+    \item Trigger Invitation on successful assert
+    \end{enumerate}
+    }\\[5em]
+  \end{tabular}};
   
- % State: ENV with different content
- \node[state,    	% layout (defined above)
-  text width=7.5cm, 	% max text width
-  above of=DATA WALLET, 	% Position is to the right of QUERY
-  node distance=6.5cm, 	% distance to QUERY
-  ] (ENV) 	% posistion relative to the center of the 'box'
- {%
- \begin{tabular}{l} 	% content
-  \textbf{Environment State (Off-Chain)}\\
-  \parbox{7.5cm}{
-  Contract tag examples:
-   \begin{enumerate}
-     \item TXT Record (web/mobile browser env)
-     \item Meta tag (web/mobile browser env)
-     \item hidden file (native app env)
-     \item application event (native/browser env)
-  \end{enumerate}
-  }
- \end{tabular}
- };
+  % State: ENV with different content
+  \node[state,    	% layout (defined above)
+    text width=7.5cm, 	% max text width
+    above of=DATA WALLET, 	% Position is to the right of QUERY
+    node distance=6.5cm, 	% distance to QUERY
+    ] (ENV) 	% posistion relative to the center of the 'box'
+  {%
+  \begin{tabular}{l} 	% content
+    \textbf{Environment State (Off-Chain)}\\
+    \parbox{7.5cm}{
+    Contract tag examples:
+    \begin{enumerate}
+      \item TXT Record (web/mobile browser env)
+      \item Meta tag (web/mobile browser env)
+      \item hidden file (native app env)
+      \item application event (native/browser env)
+    \end{enumerate}
+    }
+   \end{tabular}
+    };
  
- % STATE CONTRACT
- \node[state,
-  right of=DATA WALLET,
-  node distance=9.5cm,
-  text width=6cm] (CONTRACT) 
- {%
- \begin{tabular}{l}
-  \textbf{Consent Contract (On-Chain)}\\
-  \parbox{6cm}{
-  On-Chain URI examples:
-      \begin{enumerate}
-        \item Web URL
-        \item application signature
-      \end{enumerate}
-  }
- \end{tabular}
- };
+    % STATE CONTRACT
+    \node[state,
+    right of=DATA WALLET,
+    node distance=9.5cm,
+    text width=6cm] (CONTRACT) 
+  {%
+  \begin{tabular}{l}
+    \textbf{Consent Contract (On-Chain)}\\
+    \parbox{6cm}{
+    On-Chain URI examples:
+        \begin{enumerate}
+          \item Web URL
+          \item application signature
+        \end{enumerate}
+    }
+    \end{tabular}
+    };
 
 
- % draw the paths and and print some Text below/above the graph
- \path (DATA WALLET) 	edge[bend left=20]  node[anchor=west,left]{$1$} (ENV)
- (ENV) 	edge[bend left=20]  node[anchor=east,right]{$2$} (DATA WALLET)
- (DATA WALLET)     	edge[bend left=20] node[anchor=north,above]{$3$} (CONTRACT)
- (CONTRACT)     	edge[bend left=20] node[anchor=south,below]{$4$} (DATA WALLET)
- (DATA WALLET) 	edge[bend right=30]  node[anchor=east,right]{$5$} (ENV);
+    % draw the paths and and print some Text below/above the graph
+    \path (DATA WALLET) 	edge[bend left=20]  node[anchor=west,left]{$1$} (ENV)
+    (ENV) 	edge[bend left=20]  node[anchor=east,right]{$2$} (DATA WALLET)
+    (DATA WALLET)     	edge[bend left=20] node[anchor=north,above]{$3$} (CONTRACT)
+    (CONTRACT)     	edge[bend left=20] node[anchor=south,below]{$4$} (DATA WALLET)
+    (DATA WALLET) 	edge[bend right=30]  node[anchor=east,right]{$5$} (ENV);
 
-\end{tikzpicture}
+  \end{tikzpicture}
     \caption{Actor model of the tamper-resistant web3 invitation popup protocol.}
     \label{fig:PopupProtocol}
   \end{figure*}
