@@ -4,21 +4,21 @@
 \subsection{Architecture}
 \label{section:Architecture}
 
-This section will discuss the initial implementation and design decisions of the Protocol. The Protocol has three primary 
+This section will discuss the implementation and design decisions of the Protocol. The Protocol has three primary 
 components: a data wallet implementation, an on-chain data control plane, and aggregation service providers.
 
 The data wallet is a software client that implements functionality which enables end-users to collect, index, and store their data as well as participate 
 in the decentralized data network, see section \ref{section:DataWallet}. Organizations (consumers of data insights) will be able 
 to query populations of data wallets through an on-chain control plane that adheres to a publish-subscribe (pub-sub) pattern, see section \ref{section:OnChain}. 
 
-At the core of the control plane is an upgradable contract factory which produces independent instances of an EIP-721 compatible consent contract. 
+At the core of the control plane is an upgradable contract factory which produces independent instances of an EIP-721 compatible consent registry. 
 Consent tokens claimed from these consent contracts are non-transferable but can be burned by the recipient. Claiming a consent token denotes a data 
 wallet user's consent to participate in network queries in return for rewards (which may or may not be web3 digital assets). 
 
-Data wallets receive queries via EVM events emitted from consent contracts they have claimed tokens in. These events contain metadata encoding
+Data wallets receive queries via EVM events emitted from consent registry contracts they have claimed tokens in. These events contain metadata encoding
 instructions (written in SDQL) to run computations on the data stored in the data wallet to produce insights. Once a data wallet has produced
 the requested insight, it performs a digital "handshake" with the aggregation service provider specified in the query metadata such that the 
-data wallet owner receives a reward while the requesting organization receives the insight, see figure \ref{OnChainOffChain}. 
+data wallet owner receives a reward while the requesting organization receives the insight, see figure \ref{fig:OnChainOffChain}. 
 
 User consent and data flow is thus orchestrated in a distributed manner by the Protocol. It is also worth highlighting that while 
 Snickerdoodle Labs will develop service infrastructure for the protocol (such as producing a data wallet and a SaaS product offering 
@@ -31,7 +31,7 @@ data wallet client or act as an aggregation service provider if the specificatio
 \subsubsection{Consent Contract Factory}
 
 \input{ConsentContractPubSubTikz}
-The on-chain component of the Protocol functions as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
+The on-chain components of the Protocol functions as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
 in which organizations publish new instances of an EIP-721 compatible consent registry (see \ref{section:ConsentContract}), and end-users 
 subscribe to the registries by claiming a non-transferrable consent token. The publishing action is performed via the Protocol's upgradable 
 consent contract factory, see figure \ref{fig:ConsentFactory}. The factory contract will be the entrypoint to the Protocol for new insight 
@@ -66,11 +66,53 @@ The upgradeability pattern is based on EIP-1967 (CITE) and is implemented throug
 
 \input{OnChainOffChainInteractionTikz}
 
-Another part of the Snickerdoodle Protocol is the creation of consent contracts. Consent contracts allow businesses to create data pools by 
-signaling they want data and give people a way to consent to share data. At a high-level, businesses first create a consent contract via a 
-contract factory. People can then consent to share their data and receive a non-transferable consent token. At this point, the data wallet 
-listens to events emitted from the consent contract. These events contain the CID of an SDQL query. By responding to the query and sharing 
-data, people will receive some reward such as an NFT or a Doodle token (see section \ref{section:tokenomics}).
+\input{OnChainOffChainInteractionTikz}
+
+Consent registry contracts are the primary on-chain mechanism by which insight consumers interact with with data wallet end-users. Consent 
+registries allow organizations to create data pools by serving as an on-chain data structure that holds metadata regarding the conditions 
+under which data is to be collected and used as well as a cryptographically verifiable list of externally owned accounts (EOAs) that have
+have given consent to participate in the data pool. 
+
+Consent registries expose an EIP-721 compatible interface. This is for developer integration convenience as it allows consent registries to 
+be readable by most existing NFT indexing services (such as Snowtrace). Consent is denoted by ownership of a non-transferrable consent NFT 
+(non-fungible token) which can be burned by the owner at any time. 
+
+\paragraph{Request for Data Events}
+
+After an organization has published a consent registry via the Consent Contract Factory (see \ref{section:ConsentFactory}), the organization can emit
+EVM events by calling a special function, $requestForData$, which takes a content identifier as its only input. This content identifier is used to 
+retrieve the request specifications from a suitable content addressable network (like IPFS) that the data wallets will process. Data wallets can detect 
+past $requestForData$ events by constructing EVM query filters and requesting all EVM logs that match those filters. Thus consent registries offer a 
+tamper-resistant communication layer between organizations and participants in their data pools. See figure \ref{fig:OnChainOffChain}
+
+Consent registries also specify a $queryHorizon$ which inform data wallets of the oldest block number to search for these events. This variable is 
+first initialized to the block number that the proxy contract was deployed from the contract factory and can be updated by an EOA with the $DEFAULT\_ADMIN\ROLE$
+to a later blocknumber (but cannot be changed to an earlier block number). Setting a reasonable value for $queryHorizon$ is important since many RPC providers
+only allow for query filters to search a limited history of the chain.
+
+\paragraph{User Data Permissioning}
+
+A $requestForData$ event indicate that it requires access to multiple attributes indexed by the user's data wallet client, such as country of origin, age,
+on-chain contracts they have interacted with using their linked EOA asset account. However, users can set granular permissions regarding their indexed data 
+attributes. 
+
+Every consent token issued from a consent registry has an associated set of binary $aggreementFlags$. There are 256 flags in total (the size of an EVM word) 
+though not all flags will be assigned to specific attributes at Protocol launch, leaving room for customization. Only the owner of a consent token can 
+update the granular permissions denoted by the token's $agreementFlag$s. The availability of granular consent data on-chain allows organizations to better 
+understand what kinds of insights they will be able to obtain from their data pool before calling $requestForData$. 
+
+\paragraph{Consent Invitations}
+\label{section:ConsentInvitations}
+
+\input{Web3PopupTikz}
+The Protocol allows for the decentralized, trustless, and tamper-resistant detection of events that should be presented to the data wallet 
+end user in a format appropriate for the environment. In a web browser setting, the data wallet detects the current active URL, and via DNS 
+over HTTPS (DoS) queries the TXT records associated with the apex domain. If the TXT record contains a reference to a Protocol consent 
+contract address, the data wallet then fetches the URLs registered in the contract metadata on the blockchain and cross-references the domains 
+listed from the contract to the current URL. If the data wallet detects that the current URL is included in the domains listed in the 
+consent contract, the data wallet will inject a popup into the browser DOM. The content of the popup is fetched from an appropriate content 
+addressable network (such as IPFS) and the content address is given by the consent contract metadata. The Web3 popup protocol can be 
+extended to other environments including mobile browsing environments, VR experiences, gaming consoles, etc as indicated by figure \ref{fig:PopupProtocol}. 
 
 \paragraph{Meta Transactions}
 
@@ -82,32 +124,6 @@ Also, people don't like spending money on gas costs (do I need to cite?).
 
 Meta transactions follow the ERC2771 standard and are implemented using OpenZepplin's libraries (CITE).
 
-\subsubsection{Consent Contract}
-\label{section:ConsentContract}
-
-The consent contract represents a single data pool and signals the desire to subscribe to data and facilitates the exchange of insights. These contracts 
-issue consent tokens for opt-in and allow the token burning for opt-outs. The contracts can define eligibility and other rules around user opt-ins. 
-Consent contracts are also responsible for emitting data requests for the wallet listeners.
-
-% reference previous section about implementation
-
-
-\subsubsection{Consent Tokens}
-% represent opt-ins on the user side
-% essentially cookies in the snickerdoodle model
-% can offer rewards to incentivize opt-in (not made yet...) (ref:tokenomics)
-% can be burned to opt-out
-% non-transferable
-Consent tokens are non-transferable NFTs that conform to the ERC-721 standard. A user owning a token represents that user's consent to participate in the 
-data pool with which the token is associated. Conversely, burning this token represents a repudiation of that consent. Because consent can't be transferred, 
-these tokens are non-transferable.
-
-% include the reason they are non-transferable
-
-Data subscribers can know how many people have consented to share data with them and can respond to their queries. Knowing how many people have consented to 
-a particular subscriber allows the Snickerdoodle Protocol to have a fee structure where subscribers who access more data pay more. The protocol will do this 
-by charging a fee in Doodle tokens proportional to the number of consent tokens to emit the event. For more information about the fee structure and the token, 
-see section \ref{section:tokenomics}.
 
 \subsubsection{Doodle Token}
 \label{section:DoodleToken}
@@ -453,20 +469,6 @@ holders and enforce the integrity of those plugins at the execution level. The D
 The certificate registry will be implemented as an ERC-721 contract where the token URI holds the checksum and domain name. The DAO will be the only party 
 authorized to modify this registry. See section \ref{section:TokenDAO} for more details on the DAO.
 %reference DAO
-
-\subsection{Tamper Resistant Web3 Invitation Popups}
-\label{section:Web3Popus}
-
-\include{Web3PopupTikz}
-
-The protocol allows for the decentralized, trustless, and tamper-resistant detection of events that should be presented to the data wallet 
-end user in a format appropriate for the environment. In a web browser setting, the data wallet detects the current active URL, and via DNS 
-over HTTPS (DoS) queries the TXT records associated with the apex domain. If the TXT record contains a reference to a Protocol consent 
-contract address, the data wallet then fetches the URLs registered in the contract metadata on the blockchain and cross-references the domains 
-listed from the contract to the current URL. If the data wallet detects that the current URL is included in the domains listed in the 
-consent contract, the data wallet will inject a popup into the browser DOM. The content of the popup is fetched from an appropriate content 
-addressable network (such as IPFS) and the content address is given by the consent contract metadata. The Web3 popup protocol can be 
-extended to other environments including mobile browsing environments, VR experiences, gaming consoles, etc as indicated by figure \ref{fig:PopupProtocol}. 
 
 \subsection{Data Ingestion Provider} % name for role?
 % How we allow data subscribing and apps

@@ -24,6 +24,7 @@
         \path [line2] (BEACON) -- node [near start, right] {new reference} (IMP2);
     \end{tikzpicture}
     \caption{The upgradable beacon pattern was popularized by the Dharma protocol. It allows for many proxy contracts to be upgraded with a single
-    transaction as well as for gas-efficient deployments of new proxy contracts.}
+    transaction as well as for gas-efficient deployments of new proxy contracts. When a function call is directed at a proxy, the proxy retrieves the
+    implementation address from the upgradeable beacon then delegates the function call to the contract at that address.}
     \label{fig:UpgradePattern}
 \end{figure}

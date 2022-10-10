@@ -24,7 +24,7 @@
     \begin{tikzpicture}[node distance = 2cm, auto]
         % Place nodes
         \node [factoryblock,  node distance=5cm] (FACTORY) {Consent Contract Factory};
-        \node [contract, below of=FACTORY,  node distance=4cm] (CONTRACT) {Consent Contract};
+        \node [contract, below of=FACTORY,  node distance=4cm] (CONTRACT) {Consent Registry};
         \node [aggregator, below of=CONTRACT,  node distance=3.5cm] (AS) {Aggregator Service};
         \node [actorblock, right of=AS,  node distance=6cm] (DW) {Data Wallet};
         \node [actorblock, left of=AS,  node distance=6.5cm] (IC) {Insight Consumer};
@@ -44,7 +44,7 @@
           \node[offchain, label={Off-Chain}] [fit = (IC) (AS) (DW)] {};
         \end{pgfonlayer}
     \end{tikzpicture}
-    \caption{Insight consumers reach data wallet users by broadcasting events from a consent contract instance. Only data wallets that have
+    \caption{Insight consumers reach data wallet users by broadcasting events from a consent registry instance. Only data wallets that have
     claimed a non-transferrable consent token listen for events and deliver insights to the aggregation service URL listed in the associated
     request-for-data event.}
     \label{fig:OnChainOffChain}
