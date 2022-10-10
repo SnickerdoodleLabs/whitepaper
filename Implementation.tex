@@ -37,7 +37,7 @@ subscribe to the registries by claiming a non-transferrable consent token. The p
 consent contract factory, see figure \ref{fig:ConsentFactory}. The factory contract will be the entrypoint to the Protocol for new insight 
 consumers, since a consent registry is required to communicate with the network of data wallets. 
 
-\include{ContractUpgradePatternTikz}
+\input{ContractUpgradePatternTikz}
 The consent contract factory exists as a utility for insight consumers to create new consent registries. The factory is implemented with an 
 upgradable beacon pattern, see figure \ref{fig:UpgradePattern} to enable gas-efficient deployments and to allow for seamless extensions of functionality
 via DAO proposals. 
