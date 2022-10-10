@@ -30,14 +30,14 @@ data wallet client or act as an aggregation service provider if the specificatio
 
 \subsubsection{Consent Contract Factory}
 
-\include{ConsentContractPubSubTikz}
+\input{ConsentContractPubSubTikz}
 The on-chain component of the Protocol functions as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
 in which organizations publish new instances of an EIP-721 compatible consent registry (see \ref{section:ConsentContract}), and end-users 
 subscribe to the registries by claiming a non-transferrable consent token. The publishing action is performed via the Protocol's upgradable 
 consent contract factory, see figure \ref{fig:ConsentFactory}. The factory contract will be the entrypoint to the Protocol for new insight 
 consumers, since a consent registry is required to communicate with the network of data wallets. 
 
-\include{ContractUpgradePatternTikz}
+\input{ContractUpgradePatternTikz}
 The consent contract factory exists as a utility for insight consumers to create new consent registries. The factory is implemented with an 
 upgradable beacon pattern, see figure \ref{fig:UpgradePattern} to enable gas-efficient deployments and to allow for seamless extensions of functionality
 via DAO proposals. 
@@ -61,6 +61,17 @@ consent contracts inherit the functionality (and any new storage variables) defi
 
 The upgradeability pattern is based on EIP-1967 (CITE) and is implemented through OpenZeppelin libraries (CITE).
 
+\subsubsection{Consent Registries}
+\label{section:ConsentContract}
+
+\input{OnChainOffChainInteractionTikz}
+
+Another part of the Snickerdoodle Protocol is the creation of consent contracts. Consent contracts allow businesses to create data pools by 
+signaling they want data and give people a way to consent to share data. At a high-level, businesses first create a consent contract via a 
+contract factory. People can then consent to share their data and receive a non-transferable consent token. At this point, the data wallet 
+listens to events emitted from the consent contract. These events contain the CID of an SDQL query. By responding to the query and sharing 
+data, people will receive some reward such as an NFT or a Doodle token (see section \ref{section:tokenomics}).
+
 \paragraph{Meta Transactions}
 
 Meta transactions allow someone else to pay for a user's gas fees. Every state-changing transaction (i.e., any transaction with a gas fee) will 
@@ -70,18 +81,6 @@ the native gas token to their Snickerdoodle Wallets, which often involves buying
 Also, people don't like spending money on gas costs (do I need to cite?). 
 
 Meta transactions follow the ERC2771 standard and are implemented using OpenZepplin's libraries (CITE).
-
-\subsubsection{Consent Contracts}
-\label{section:ConsentContract}
-
-\include{OnChainOffChainInteractionTikz}
-
-Another part of the Snickerdoodle Protocol is the creation of consent contracts. Consent contracts allow businesses to create data pools by 
-signaling they want data and give people a way to consent to share data. At a high-level, businesses first create a consent contract via a 
-contract factory. People can then consent to share their data and receive a non-transferable consent token. At this point, the data wallet 
-listens to events emitted from the consent contract. These events contain the CID of an SDQL query. By responding to the query and sharing 
-data, people will receive some reward such as an NFT or a Doodle token (see section \ref{section:tokenomics}).
-
 
 \subsubsection{Consent Contract}
 \label{section:ConsentContract}
