@@ -120,7 +120,7 @@ The consent registries have to modes by which user's can join a data pool: open-
 enabled ($openOptInDisabled$ is $false$), any EOA is allowed to claim a consent token by calling the $optIn$ method and paying the associated gas
 fees. Registries where $openOptInDisabled$ is $true$ are invite only and require a signature for an EOA with the $SIGNER\_ROLE$ in order to join 
 a data pool. There are two available methods for invitation-only user opt-in: $restrictedOptIn$ and $anonymousRestrictedOptIn$. The former method
-requires that the recipient EOA be known in advance by the $SIGNER_ROLE$ in order to construct the appropriate signature. The receiving EOA then 
+requires that the recipient EOA be known in advance by the $SIGNER\_ROLE$ in order to construct the appropriate signature. The receiving EOA then 
 becomes the only account that can call $restrictedOptIn$ with that signature. If the recipient EOA address is not known ahead of time, the $SIGNER\_ROLE$
 can construct a signature for use with the $anonymousRestrictedOptIn$ method in which any EOA can submit the signature to that method (a single time) 
 in order to opt-in. 
@@ -133,43 +133,22 @@ adoption hurdles. Consent registries implement EIP-2772 compatible metatransacti
 Meta transactions allow someone else to pay for a user's gas fees. All opt-in methods will implement support for metatransactions. This will offer the 
 flexibility to have users pay for their own gas or have the businesses pay.  
 
-\subsubsection{Doodle Token}
-\label{section:DoodleToken}
-% general description
-% ERC-20 
-% why 
-%   token for governance and fees
-% how 
-%      some kind of wrapping for subnet
-%       3 implementations bc we plan on subnet (2 on subnet)
-%           native DOODLE (not ERC-20) -- wrap with DAO contract
-%           WDOODLE (ERC-20) so you can vote in DAO 
-%           ----- not subnet below -----
-%           vanilla DOODLE (ERC-20) linked on C-Chain+others for other bridging ERC-20 infrastructure 
-%       If on a different EVM network:
-%              Just DOODLE (ERC-20)
-%           vanilla DOODLE (ERC-20) linked for bridging ERC-20 infrastructure 
-%   ERC-20 + openzepplin
-The token that powers the protocol will be the Doodle Token. This token will be used for paying Snickerdoodle Subnet gas fees, paying Snickerdoodle Protocol 
-fees, and voting in the Snickerdoodle DAO. 
+\subsubsection{EIP-20 Token}
+\label{section:Token}
+The Protocol includes a fungible utility token adhering to the EIP-20 standard. This token will be used for paying various fees required to leverage
+the Protocol (like publishing a new consent registry) and will also be used for voting in the Prodocol DAO. The associated voting mechanism that 
+accompanies the possession of a token can be delegated to a different address without relinquishing ownership of the token
 
-The Doodle Token will come in several forms to support these use cases. First, it is a native non-ERC-20 token of the Snickerdoodle subnet. This native 
-token will be used to pay both gas and protocol fees. The second form will be an ERC-20 token, Wrapped Doodle (WDOODLE), representing votes in the DAO. 
-The DAO itself will have a contract that can convert DOODLE and WDOODLE back and forth. Lastly, there will be vanilla ERC-20 implementations of the DOODLE 
-on other EVM chains to enable bridging so the DOODLE can be used with other standard ERC-20 infrastructure. We will use openZepplin Libraries to implement 
-these contracts. 
-
-
-\subsubsection{DAO}
+\subsubsection{Decentralized Autonomous Organization}
 \label{section:ImplementationDAO}
-% general description
-% why
-%   Need decentralized way to control allowed queries, certificate authorities, allow/ban lists for known good/bad actors
-% how
-%   openzeplin curve finance
-The DAO is the decentralized governance mechanism of the Snickerdoodle Protocol. The DAO creates a decentralized way to manage allowed queries, acts as a 
-certificate authority for the code distribution, and controls an allow/ban list of good/bad actors. The DAO will be modeled on Curve Finance's DAO (CITE) 
-and will be implemented with OpenZepplin libraries (CITE). 
+
+The Protocol will include a decentralized autonomous organization (DAO) implementation. The DAO will be responsible for proposing and executing upgrades to 
+the Protocol. The particular pattern used by the Protocol DAO is based on Curve Finance's DAO and will be implemented with OpenZeppelin libraries. 
+
+Token holders (see section \ref{section:Token}), are responsible for the creation and execution of DAO proposals. At mainnet launch it is anticipated that one 
+token will render one vote, though this too could be modified via a DAO proposal. Token holders will have to reach a pre-specified quorum of voting power in 
+order to successfully create a proposal in the DAO task queue. Successful proposals will be subject to a delay of at least one block before they can be executed 
+in order to prevent flash loan attacks. 
 
 \subsubsection{Queries}
 % SDQL queries (add visuals)
