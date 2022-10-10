@@ -29,6 +29,7 @@ data wallet client or act as an aggregation service provider if the specificatio
 \label{section:OnChain}
 
 \subsubsection{Consent Contract Factory}
+\label{section:ConsentFactory}
 
 \input{ConsentContractPubSubTikz}
 The on-chain components of the Protocol functions as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
@@ -65,9 +66,6 @@ The upgradeability pattern is based on EIP-1967 (CITE) and is implemented throug
 \label{section:ConsentContract}
 
 \input{OnChainOffChainInteractionTikz}
-
-\input{OnChainOffChainInteractionTikz}
-
 Consent registry contracts are the primary on-chain mechanism by which insight consumers interact with with data wallet end-users. Consent 
 registries allow organizations to create data pools by serving as an on-chain data structure that holds metadata regarding the conditions 
 under which data is to be collected and used as well as a cryptographically verifiable list of externally owned accounts (EOAs) that have
@@ -80,7 +78,7 @@ be readable by most existing NFT indexing services (such as Snowtrace). Consent 
 \paragraph{Request for Data Events}
 
 After an organization has published a consent registry via the Consent Contract Factory (see \ref{section:ConsentFactory}), the organization can emit
-EVM events by calling a special function, $requestForData$, which takes a content identifier as its only input. This content identifier is used to 
+EVM events by calling a special function, $requestForData$, which takes a content identifier (CID) as its only input. This CID is used to 
 retrieve the request specifications from a suitable content addressable network (like IPFS) that the data wallets will process. Data wallets can detect 
 past $requestForData$ events by constructing EVM query filters and requesting all EVM logs that match those filters. Thus consent registries offer a 
 tamper-resistant communication layer between organizations and participants in their data pools. See figure \ref{fig:OnChainOffChain}
