@@ -7,20 +7,24 @@
     text width=6em, text centered, rounded corners, minimum height=4em]
     \tikzstyle{implementation} = [circle, draw, fill=violet!20, 
         text width=7em, text centered, rounded corners, minimum height=5em]
-    \tikzstyle{line} = [draw, -latex']
+    \tikzstyle{line} = [draw, -latex', text width=5em]
+    \tikzstyle{line2} = [draw, -latex']
     
     \begin{tikzpicture}[node distance = 2cm, auto]
         % Place nodes
         \node [beacon] (BEACON) {Upgradable Beacon};
         \node [proxy, right of=BEACON,  node distance=7cm] (PROXY) {Proxy Contract};
-        \node [implementation, above of=BEACON,  node distance=7cm] (IMP1) {Implementation};
+        \node [implementation, above of=BEACON,  node distance=7cm] (IMP1) {Old Implementation};
         \node [implementation, right of=IMP1,  node distance=7cm] (IMP2) {New Implementation};
         % Draw edges
         \path [line] (PROXY) -- node {implementation address?} (BEACON);
-        \path [line] (PROXY) -- node {call delegation} (IMP1);
-        \path [line] (PROXY) -- node [right] {upgraded call delegation} (IMP2);
+        \path [line] (PROXY) -- node [near start, right] {old call delegation} (IMP1);
+        \path [line] (PROXY) -- node [right] {new call delegation} (IMP2);
+        \path [line2] (BEACON) -- node [near start, left] {old reference} (IMP1);
+        \path [line2] (BEACON) -- node [near start, right] {new reference} (IMP2);
     \end{tikzpicture}
     \caption{The upgradable beacon pattern was popularized by the Dharma protocol. It allows for many proxy contracts to be upgraded with a single
-    transaction as well as for gas-efficient deployments of new proxy contracts.}
+    transaction as well as for gas-efficient deployments of new proxy contracts. When a function call is directed at a proxy, the proxy retrieves the
+    implementation address from the upgradeable beacon then delegates the function call to the contract at that address.}
     \label{fig:UpgradePattern}
 \end{figure}

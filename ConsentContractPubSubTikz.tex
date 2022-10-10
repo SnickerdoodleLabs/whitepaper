@@ -16,9 +16,9 @@
         \node [daoblock] (DAO) {Protocol DAO};
         \node [actorblock, above of=DAO,  node distance=4cm] (IC) {Insight Consumer};
         \node [factoryblock, right of=DAO,  node distance=5cm] (FACTORY) {Consent Contract Factory};
-        \node [instance, right of=FACTORY,  node distance=4cm] (CONTRACT2) {Consent Contract 2};
-        \node [instance, above of=CONTRACT2,  node distance=3cm] (CONTRACT1) {Consent Contract 1};
-        \node [instance, below of=CONTRACT2,  node distance=3cm] (CONTRACT3) {Consent Contract ...};
+        \node [instance, right of=FACTORY,  node distance=4cm] (CONTRACT2) {Consent Registry 2};
+        \node [instance, above of=CONTRACT2,  node distance=3cm] (CONTRACT1) {Consent Registry 1};
+        \node [instance, below of=CONTRACT2,  node distance=3cm] (CONTRACT3) {Consent Registry ...};
         % Draw edges
         \path [line] (DAO) -- node {upgrade} (FACTORY);
         \path [line] (IC) -- node {publish} (FACTORY);
@@ -26,9 +26,9 @@
         \path [line] (FACTORY) -- node [above] {deploy} (CONTRACT2);
         \path [line] (FACTORY) |- node [near start, right] {deploy} (CONTRACT3);
     \end{tikzpicture}
-    \caption{The core of the on-chain protocol effectively implements an upgradeable, decentralized pub-sub 
+    \caption{The core of the on-chain protocol implements an upgradeable, decentralized pub-sub 
     network. Insight consumers publish consent contracts via the consent contract factory which is 
     upgradable by the Protocol DAO. The EOA which publishes a consent contract receives the 
-    DEFAULT_ADMIN_ROLE associated with that contract.}
+    $DEFAULT\_ADMIN\_ROLE$ associated with that contract.}
     \label{fig:ConsentFactory}
   \end{figure}
