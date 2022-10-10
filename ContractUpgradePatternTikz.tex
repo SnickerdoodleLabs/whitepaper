@@ -1,0 +1,26 @@
+\begin{figure}[ht] 
+    \centering
+    % Define block styles
+    \tikzstyle{beacon} = [diamond, draw, fill=red!20, 
+    text width=6em, text centered, rounded corners, minimum height=4em] 
+    \tikzstyle{proxy} = [rectangle, draw, fill=blue!20, 
+    text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{implementation} = [circle, draw, fill=violet!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{line} = [draw, -latex']
+    
+    \begin{tikzpicture}[node distance = 2cm, auto]
+        % Place nodes
+        \node [beacon] (BEACON) {Upgradable Beacon};
+        \node [proxy, right of=BEACON,  node distance=5cm] (PROXY) {Proxy Storage Contract};
+        \node [implementation, above of=BEACON,  node distance=3cm] (IMP1) {Implementation};
+        \node [implementation, right of=IMP1,  node distance=3cm] (IMP2) {New Implementation};
+        % Draw edges
+        \path [line] (PROXY) -- node {implementation address?} (BEACON);
+        \path [line] (PROXY) -- node {call delegation} (IMP1);
+        \path [line] (PROXY) -- node {upgraded call delegation} (IMP2);
+    \end{tikzpicture}
+    \caption{The upgradable beacon pattern was popularized by the Dharma protocol. It allows for many proxy contracts to be upgraded with a single
+    transaction as well as for gas-efficient deployments of new proxy contracts.}
+    \label{fig:UpgradePattern}
+\end{figure}

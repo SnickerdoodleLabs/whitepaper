@@ -1,48 +1,246 @@
 \section{Implementation}
 \label{section:Implementation}
-
-% High-level overview
-
-% diagram of protocol flow
-%   - how does data move?
-%   Query publishing -> processing -> endpoint called -> data ingestion
+%------------------------------------------------------------------------------------------
+\subsection{Architecture}
+\label{section:Architecture}
 
 This section will discuss the initial implementation and design decisions of the Protocol. The Protocol has three primary 
-components: data wallet, consent contracts, and aggregation service providers.
+components: a data wallet implementation, an on-chain data control plane, and aggregation service providers.
 
-\include{ConsentContractPubSubTikz}
-
-At a high level, the data wallet is a piece of software that will allow people to collect and store their data and participate 
+The data wallet is a software client that implements functionality which enables end-users to collect, index, and store their data as well as participate 
 in the decentralized data network, see section \ref{section:DataWallet}. Organizations (consumers of data insights) will be able 
-to query groups of data wallets through an on-chain publish-subscribe (pub-sub) protocol (see fig. \ref{fig:ConsentFactory}). 
+to query populations of data wallets through an on-chain control plane that adheres to a publish-subscribe (pub-sub) pattern, see section \ref{section:OnChain}. 
 
-An upgradable contract factory is used to produced instances of an EIP-721 compatible consent contract. Tokens claimed from these 
-consent contracts are non-transferable, but can be burned by the recipient. Claiming a token denotes a data wallet user's consent 
-to participate in network queries in return for rewards (which may or may not be web3 digital assets). Data wallets will receive 
-these queries and follow their instructions (written in SDQL) to run computations on their data to produce insights. Once a data 
-wallet receives a reward from the business, it will send that insight to an aggregation service for the business to visualize, see 
-figure \ref{OnChainOffChain}. 
+At the core of the control plane is an upgradable contract factory which produces independent instances of an EIP-721 compatible consent contract. 
+Consent tokens claimed from these consent contracts are non-transferable but can be burned by the recipient. Claiming a consent token denotes a data 
+wallet user's consent to participate in network queries in return for rewards (which may or may not be web3 digital assets). 
 
-\include{OnChainOffChainInteractionTikz}
+Data wallets receive queries via EVM events emitted from consent contracts they have claimed tokens in. These events contain metadata encoding
+instructions (written in SDQL) to run computations on the data stored in the data wallet to produce insights. Once a data wallet has produced
+the requested insight, it performs a digital "handshake" with the aggregation service provider specified in the query metadata such that the 
+data wallet owner receives a reward while the requesting organization receives the insight, see figure \ref{OnChainOffChain}. 
 
 User consent and data flow is thus orchestrated in a distributed manner by the Protocol. It is also worth highlighting that while 
 Snickerdoodle Labs will develop service infrastructure for the protocol (such as producing a data wallet and a SaaS product offering 
-for enterprise participation in the protocol), the protocol itself is, however, permissionless and open so that anyone could act as 
-an aggregation service provider if the protocol is adhered to. Aggregation and data visualization is simply another role for any 
-actor within the system to assume.
+for enterprise participation in the protocol), the protocol itself is, however, permissionless and open so that anyone could implement a 
+data wallet client or act as an aggregation service provider if the specifications of the protocol is adhered to. 
+%----------------------------------------------------------------------------------------------------------------------------------------
+\subsection{On-Chain Components}
+\label{section:OnChain}
 
+\subsubsection{Consent Contract Factory}
+
+\include{ConsentContractPubSubTikz}
+The on-chain component of the Protocol functions as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
+in which organizations publish new instances of an EIP-721 compatible consent registry (see \ref{section:ConsentContract}), and end-users 
+subscribe to the registries by claiming a non-transferrable consent token. The publishing action is performed via the Protocol's upgradable 
+consent contract factory, see figure \ref{fig:ConsentFactory}. The factory contract will be the entrypoint to the Protocol for new insight 
+consumers, since a consent registry is required to communicate with the network of data wallets. 
+
+\include{ContractUpgradePatternTikz}
+The consent contract factory exists as a utility for insight consumers to create new consent registries. The factory is implemented with an 
+upgradable beacon pattern, see figure \ref{fig:UpgradePattern} to enable gas-efficient deployments and to allow for seamless extensions of functionality
+via DAO proposals. 
+
+\paragraph{Factory Pattern}
+The factory pattern defines a smart contract which is responsible for creating other contracts. The Protocol uses the factory 
+pattern to simplify the deployment of new consent registries and to give new insight consumers a single point of entry into the data network. 
+
+\paragraph{Upgradable Beacon Pattern}
+\label{section:BeaconPattern}
+
+Consent registries are deployed as proxy contract instances that reference an upgradable beacon contract to obtain the correct address to delegate
+function calls, see \ref{fig:UpgradePattern}. This upgrade pattern compliments the factory pattern by allowing for very gas-efficient deployments 
+of new proxy instances. Proxy contracts only store storage variables and a pointer to their designated upgradable beacon contract. The upgradable 
+beacon contract points to an implementation contract. The implementation contract contains all functions implementations as well as the storage
+variable declarations that proxy contracts copy. 
+
+A Protocol upgrade to the consent registry functionality requires that a new implementation contract first be deployed to the blockchain. Then a 
+DAO proposal must be initiated to point the upgradeable beacon to the new implementation address. All previously deployed and newly created proxy 
+consent contracts inherit the functionality (and any new storage variables) defined in the new contract.
+
+The upgradeability pattern is based on EIP-1967 (CITE) and is implemented through OpenZeppelin libraries (CITE).
+
+\paragraph{Meta Transactions}
+
+Meta transactions allow someone else to pay for a user's gas fees. Every state-changing transaction (i.e., any transaction with a gas fee) will 
+have meta transactions enabled. We did this to give us the flexibility to have users pay for their own gas or have Snickerdoodle Labs or another 
+business pay. In the initial version, we don't want users to pay for their gas costs as it creates a bad user experience. Users will need to add 
+the native gas token to their Snickerdoodle Wallets, which often involves buying a new token, bridging that token, and paying gas along the way. 
+Also, people don't like spending money on gas costs (do I need to cite?). 
+
+Meta transactions follow the ERC2771 standard and are implemented using OpenZepplin's libraries (CITE).
+
+\subsubsection{Consent Contracts}
+\label{section:ConsentContract}
+
+\include{OnChainOffChainInteractionTikz}
+
+Another part of the Snickerdoodle Protocol is the creation of consent contracts. Consent contracts allow businesses to create data pools by 
+signaling they want data and give people a way to consent to share data. At a high-level, businesses first create a consent contract via a 
+contract factory. People can then consent to share their data and receive a non-transferable consent token. At this point, the data wallet 
+listens to events emitted from the consent contract. These events contain the CID of an SDQL query. By responding to the query and sharing 
+data, people will receive some reward such as an NFT or a Doodle token (see section \ref{section:tokenomics}).
+
+
+\subsubsection{Consent Contract}
+\label{section:ConsentContract}
+
+The consent contract represents a single data pool and signals the desire to subscribe to data and facilitates the exchange of insights. These contracts 
+issue consent tokens for opt-in and allow the token burning for opt-outs. The contracts can define eligibility and other rules around user opt-ins. 
+Consent contracts are also responsible for emitting data requests for the wallet listeners.
+
+% reference previous section about implementation
+
+
+\subsubsection{Consent Tokens}
+% represent opt-ins on the user side
+% essentially cookies in the snickerdoodle model
+% can offer rewards to incentivize opt-in (not made yet...) (ref:tokenomics)
+% can be burned to opt-out
+% non-transferable
+Consent tokens are non-transferable NFTs that conform to the ERC-721 standard. A user owning a token represents that user's consent to participate in the 
+data pool with which the token is associated. Conversely, burning this token represents a repudiation of that consent. Because consent can't be transferred, 
+these tokens are non-transferable.
+
+% include the reason they are non-transferable
+
+Data subscribers can know how many people have consented to share data with them and can respond to their queries. Knowing how many people have consented to 
+a particular subscriber allows the Snickerdoodle Protocol to have a fee structure where subscribers who access more data pay more. The protocol will do this 
+by charging a fee in Doodle tokens proportional to the number of consent tokens to emit the event. For more information about the fee structure and the token, 
+see section \ref{section:tokenomics}.
+
+\subsubsection{Doodle Token}
+\label{section:DoodleToken}
+% general description
+% ERC-20 
+% why 
+%   token for governance and fees
+% how 
+%      some kind of wrapping for subnet
+%       3 implementations bc we plan on subnet (2 on subnet)
+%           native DOODLE (not ERC-20) -- wrap with DAO contract
+%           WDOODLE (ERC-20) so you can vote in DAO 
+%           ----- not subnet below -----
+%           vanilla DOODLE (ERC-20) linked on C-Chain+others for other bridging ERC-20 infrastructure 
+%       If on a different EVM network:
+%              Just DOODLE (ERC-20)
+%           vanilla DOODLE (ERC-20) linked for bridging ERC-20 infrastructure 
+%   ERC-20 + openzepplin
+The token that powers the protocol will be the Doodle Token. This token will be used for paying Snickerdoodle Subnet gas fees, paying Snickerdoodle Protocol 
+fees, and voting in the Snickerdoodle DAO. 
+
+The Doodle Token will come in several forms to support these use cases. First, it is a native non-ERC-20 token of the Snickerdoodle subnet. This native 
+token will be used to pay both gas and protocol fees. The second form will be an ERC-20 token, Wrapped Doodle (WDOODLE), representing votes in the DAO. 
+The DAO itself will have a contract that can convert DOODLE and WDOODLE back and forth. Lastly, there will be vanilla ERC-20 implementations of the DOODLE 
+on other EVM chains to enable bridging so the DOODLE can be used with other standard ERC-20 infrastructure. We will use openZepplin Libraries to implement 
+these contracts. 
+
+
+\subsubsection{DAO}
+\label{section:ImplementationDAO}
+% general description
+% why
+%   Need decentralized way to control allowed queries, certificate authorities, allow/ban lists for known good/bad actors
+% how
+%   openzeplin curve finance
+The DAO is the decentralized governance mechanism of the Snickerdoodle Protocol. The DAO creates a decentralized way to manage allowed queries, acts as a 
+certificate authority for the code distribution, and controls an allow/ban list of good/bad actors. The DAO will be modeled on Curve Finance's DAO (CITE) 
+and will be implemented with OpenZepplin libraries (CITE). 
+
+\subsubsection{Queries}
+% SDQL queries (add visuals)
+% need to be content-addressed (IPFS, Arweave, etc)
+% will be published with the request for verifiability
+Queries are responsible for specifying the who, what, and why of data processing. They allow data subscribers to define who they want data from, what type 
+of computation to run, where to send the insight, and the reward for sending the insight. These queries must be content-addressed, so anyone can access the 
+query and verify its validity. For the initial version of the Snickerdoodle Protocol, we will be publishing these queries on IPFS. In the future, the protocol 
+will support queries hosted through other means.
+
+TODO add info only allow queries if there are 30+ consent tokens given out
+
+\subsubsection{Network \& Fees}
+% general description
+%   One an avax subnet
+%   ARE WE SUBNET OR ON ANOTHER NETWORK
+% why
+%   Want scalability and lower fees
+%   EVM
+% how
+%   Still 
+
+% fees
+%   fee in native currency for any statechanging action we take (gas)
+%       (creating contract, consent tokens, emitting events)
+%   extra fee in DOODLEs for accessing insights
+%   rewards
+The Snickerdoodle Protocol will be deployed on the Snickerdoodle Network, which will be an EVM-compatible Avalanche Subnet. Our requirements for the 
+network were we wanted a scalable network with low fees and EVM compatibility. Making an Avalanche Subnet fit these requirements (IDK more and IDK the how).
+
+As mentioned in \ref{section:DoodleToken}, the native token of this subnet will be the Doodle and will be used for paying fees. Within the context 
+of the protocol and managing data, gas fees will be paid for creating consent contracts, creating consent tokens, and emitting events (i.e., SDQL queries). 
+Data subscribers will pay additional protocol fees to emit an SDQL query to access insights. This protocol fee will be proportional to the amount of data 
+being accessed and can be calculated using the number of consent tokens tied to a specific contract.
+
+\subsubsection{Rewards}
+% Initial version will be trust centric
+%   Get query give data, trust get reward, trust get valid data
+% Atomic swaps / escrow something to look at
+%   Simple way would be DOODLEs as only reward that this works with
+%   Future look into ZK transfers
+After sharing insights, the protocol will facilitate the transfer of rewards to the data owner. The owner can choose which wallet to send rewards to, not 
+just the data wallet. In the initial version of the protocol, the insights/rewards transfer process will be trust-centric. When an owner responds to a 
+query, they must trust that the business will send them the reward later. When subscribers send a reward, they need to trust that the user is sending 
+over authentic insights. In future versions, we will enable atomic reward swaps. Atomic swaps allow insights to be shared at the same instance that a 
+reward is received. We could easily add this functionality if the rewards are in DOODLE tokens, and zero-knowledge proofs could enable atomic swaps 
+with different assets across chains (see \ref{section:AtomicSwaps}).
+
+\subsubsection{Privacy}
+% This is how users signal consent
+% Trade-off of public knowledge with utility
+%   Privacy of everyone knowing who's giving consent to Shrapnel
+%   Everyone knows what queries Shrapnel is interested in
+%       Potential loss of competitive edge + buisisness privacy
+%           - Reason is Philosophical argument (transparency, control, risk reduction)
+%           - Need future section about creating private query cohorts
+% Reasons why we are ok with tradeoffs made for now
+A user receiving a consent token is how users signal their consent and a business emitting an event is how they signal they are interested in a particular 
+insight. This transparency in knowledge does come with some privacy tradeoffs:
+\begin{itemize}
+  \item Everyone knows who is giving consent to a business
+  \item Everyone knows what queries a business has run
+\end{itemize}
+
+These privacy trade-offs are acceptable for the initial version of the protocol. Our goals are to make sure users are able to give informed consent to the 
+use of their data, data isn't revealed if this consent isn't given, insights rather than raw data are revealed if consent is given, and businesses will pay 
+more to send queries to more people. The use of public consent tokens allows us to achieve these goals with an acceptable amount of privacy. It also gives 
+the initial version of the protocol an interoperability bonus by allowing the consent tokens to integrate with existing web3 solutions. By making consent a 
+public token that conforms to the ERC-721 standard, people can see what they've consented to through any application that shows owned NFTs. In a future 
+version, we could create ways to hide this information. For example, an anonymized consent token could be minted while the data wallet listens and responds 
+to events. %TODO maybe reference future
+
+
+It's also worth pointing out that this decision doesn't reduce the privacy of individuals too much more than if we didn't use public consent tokens. Accepting 
+rewards linked to a business reveals that consent has been given to that business (i.e., Alice having a Bob's Business NFT means everyone knows Alice consented 
+to provide information to Bob's Business). Additionally, there will be a limited number of subscribers for the initial release, all of which will be web3 
+companies. This limitation reduces the information revealed by owning a token. Holding a consent token for a particular business indicates interaction with 
+the business and the willingness to adopt a web3 product for a reward. The former is already public knowledge by looking at the blockchain's history, and the 
+latter is a common trait of web3 users.
+
+
+We are also ok reducing businesses' privacy by making what queries are run public. We feel that more transparency in what information businesses are interested 
+in gives people more insight into whether they want to share their data and reduces the societal risk of companies running complex insights that hurt the 
+commonwealth. If we need to add more privacy to businesses, we could add it in future versions by creating private query cohorts. See section \ref{section:Future} 
+for a discussion on future changes to the protocol that can increase privacy.
+%----------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Data wallet}
 \label{section:DataWallet}
-% This is how the individual interacts within data economy
-%      Method to collect, consent, store, share, manage
-%.     in a safe fashion
-%
 
 \input{DataWalletStructureTikz}
 
 \input{InsightControlFLowTikz}
 
-The data wallet is the primary end-user client interface within the Snickerdoodle protocol. It enables data ownership by facilitating user control 
+The data wallet is the primary end-user client interface within the Protocol. It enables data ownership by facilitating user control 
 and consent to the collection, storage, and usage of their data. The data wallet should provide the following functionality:
 \begin{itemize}
   \item Secure storage of the data
@@ -95,7 +293,7 @@ of their own data and allow for participation in the Protocol.
 %   Verified / third party data (future)
 Secure storage of data is crucial to allowing people to own their data. The initial data wallet implementation produced by 
 Snickerdoodle Labs will expose a modular storage interface capable of integrating with various storage provider technologies, 
-such as Google Storage, Amazon S3, or decentralized options like Ceramic Network.
+such as Google Storage, Amazon S3, or decentralized options like the Ceramic Network.
 
 It is also important to call out the wallet's storage of public-private key pairs. A data wallet should only store public keys 
 and digital signatures associated with accounts linked to a user's data wallet, not private keys. 
@@ -271,198 +469,6 @@ consent contract, the data wallet will inject a popup into the browser DOM. The 
 addressable network (such as IPFS) and the content address is given by the consent contract metadata. The Web3 popup protocol can be 
 extended to other environments including mobile browsing environments, VR experiences, gaming consoles, etc as indicated by figure \ref{fig:PopupProtocol}. 
 
-\subsection{Consent Contracts} % This kinda feels like current web3 component
-\label{section:Contracts}
-% We want a way for business to signal they want access to data and individuals to signal that they've consented to (some) of the data sharing
-
-% businesses create data pools for themselves
-% create queries for data within those pools
-% users are compensated for participation
-%   - nft rewards attached to queries
-%   - doodles (ref: tokenomics)
-
-% Contract features (include diagram)
-Another part of the Snickerdoodle Protocol is the creation of consent contracts. Consent contracts allow businesses to create data pools by 
-signaling they want data and give people a way to consent to share data. At a high-level, businesses first create a consent contract via a 
-contract factory. People can then consent to share their data and receive a non-transferable consent token. At this point, the data wallet 
-listens to events emitted from the consent contract. These events contain the CID of an SDQL query. By responding to the query and sharing 
-data, people will receive some reward such as an NFT or a Doodle token (see section \ref{section:tokenomics}).
-
-% dividend instead of reward is an interesting word
-
-% Another part of the Snickerdoodle Protocol is the creation of data pools. Data pools are a way for business to signal they want data and for people to give consent to sharing data. At a high level business first create a data pool by creating a consent contract. People can then consent to sharing their data and receive a consent token. At this point the data wallet listens to events from the consent contract that will send over the CID of a SDQL query. By responding to the query and sharing data, people will receive some reward such as a NFT or a reward (see section \ref{section:tokenomics}).
-
-
-%TODO diagram
-
-\subsubsection{Contract Factory}
-% - consent contract factory -> creates consent contracts
-%       - meta transactions
-%       - gas optimization / easy protocol updates
-%       - detail beacon model here
-The consent contract factory exists as an interface for data subscribers to create new consent contracts. The contract factory pattern is a gas-efficient way to make new, upgradeable contracts. The factory contract will be implemented with an upgradable beacon pattern to optimize for gas and make it easier to upgrade. The contracts will also support meta-transactions, allowing companies to pay the gas fees for their user's participation in the network (e.g., minting consent tokens and rewards). The full consent contract factory flow is outlined below: <insert figure>
-
-\paragraph{Factory Pattern}
-The factory pattern is a pattern where a smart contract is responsible for creating other contracts. The Snickerdoodle Protocol will use the factory pattern to simplify the deployment of new consent contracts for each subscriber. This simplicity makes it easier for developers to manage, creates a trustless way for subscribers to deploy consent contracts, and improves security by making the contract easier to audit and limiting the scope of each contract. Additionally, the contract factory pattern can reduce the gas cost of deploying new contracts, especially when implemented through proxies and upgradable beacon patterns (see section \ref{section:BeaconPattern}).
-
-\paragraph{Proxies & Upgradable Beacon Patterns}
-\label{section:BeaconPattern}
-% General description
-%       include proxy pattern and point to upgradable beacon proxy
-%
-% why
-%   Optimizes gas of nearly identical consent contracts
-%   Upgradability? -- reason we can easily change lots of contracts at the same time
-% How we build it
-%   openzeplin libraries
-%   Upgradability? -- how are we doing it 
-%       EIP-1967 specific upgradability for upgradable proxy / storage layer works
-%       upgradable beacon
-%   pointing to upgradable beacon contract -- discuss in next section
-
-% \paragraph{Beacon}
-% maybe  include in pervious section
-% contract that points to the implmentation
-% updates the proxy contracts
-%   reason is it allows for easy upgrades
-Consent contracts themselves will be created with proxies and upgradable beacon contracts. This works because the contract factory contract will create new proxy consent contracts. These proxy contracts contain minimal information, only storing their state and a pointer to the upgradable beacon contract. The upgradable beacon contract points to the current implementation of the consent contract. This deployed contract contains all of the functions and stored values of the consent contract, which the proxy consent contracts inherit. If we want to update consent contracts, we can deploy a new consent contract and change the upgradable beacon to point to the new contract. All previously deployed and newly created proxy consent contracts will now inherit the functionality defined in the new contract. Figure TODO shows this flow.
-
-We are using proxies and upgradable beacon patterns to save on gas and improve upgradability. Proxies help reduce gas costs when deploying many identical contracts as each new contract is very small. This pattern also reduces gas costs when upgrading many contracts simultaneously. It also simplifies the process of upgrading, which has DevOps and security benefits.
-
-
-The upgradability pattern is based on EIP-1967 (CITE) and is implemented through OpenZepplin libraries (CITE).
-
-\paragraph{Meta Transactions}
-% General description
-%   Enabled for all statechanging txs (anything with gas fees)
-%   msgsender gets overridden
-
-% why
-%   Easier usability as users don't need to pay money to interact (not strictly necessary)
-%   Either SDL or business pays
-
-
-% how
-%   openzeplin
-%   Both for creating contracts and creating consent tokens
-%   ERC2771ContextUpgradeable
-
-Meta transactions allow someone else to pay for a user's gas fees. Every state-changing transaction (i.e., any transaction with a gas fee) will have meta transactions enabled. We did this to give us the flexibility to have users pay for their own gas or have Snickerdoodle Labs or another business pay. In the initial version, we don't want users to pay for their gas costs as it creates a bad user experience. Users will need to add the native gas token to their Snickerdoodle Wallets, which often involves buying a new token, bridging that token, and paying gas along the way. Also, people don't like spending money on gas costs (do I need to cite?). 
-
-Meta transactions follow the ERC2771 standard and are implemented using OpenZepplin's libraries (CITE).
-
-
-\subsubsection{Consent Contract}
-\label{section:ConsentContract}
-% - issues consent tokens for opt-in
-% - elgibility logic for opt-ins
-% - emits events when query is published with SDQL CID
-The consent contract represents a single data pool and signals the desire to subscribe to data and facilitates the exchange of insights. These contracts issue consent tokens for opt-in and allow the token burning for opt-outs. The contracts can define eligibility and other rules around user opt-ins. Consent contracts are also responsible for emitting data requests for the wallet listeners.
-
-% reference previous section about implementation
-
-
-\subsubsection{Consent Tokens}
-% represent opt-ins on the user side
-% essentially cookies in the snickerdoodle model
-% can offer rewards to incentivize opt-in (not made yet...) (ref:tokenomics)
-% can be burned to opt-out
-% non-transferable
-Consent tokens are non-transferable NFTs that conform to the ERC-721 standard. A user owning a token represents that user's consent to participate in the data pool with which the token is associated. Conversely, burning this token represents a repudiation of that consent. Because consent can't be transferred, these tokens are non-transferable.
-
-% include the reason they are non-transferable
-
-Data subscribers can know how many people have consented to share data with them and can respond to their queries. Knowing how many people have consented to a particular subscriber allows the Snickerdoodle Protocol to have a fee structure where subscribers who access more data pay more. The protocol will do this by charging a fee in Doodle tokens proportional to the number of consent tokens to emit the event. For more information about the fee structure and the token, see section \ref{section:tokenomics}.
-
-\subsubsection{Doodle Token}
-\label{section:DoodleToken}
-% general description
-% ERC-20 
-% why 
-%   token for governance and fees
-% how 
-%      some kind of wrapping for subnet
-%       3 implementations bc we plan on subnet (2 on subnet)
-%           native DOODLE (not ERC-20) -- wrap with DAO contract
-%           WDOODLE (ERC-20) so you can vote in DAO 
-%           ----- not subnet below -----
-%           vanilla DOODLE (ERC-20) linked on C-Chain+others for other bridging ERC-20 infrastructure 
-%       If on a different EVM network:
-%              Just DOODLE (ERC-20)
-%           vanilla DOODLE (ERC-20) linked for bridging ERC-20 infrastructure 
-%   ERC-20 + openzepplin
-The token that powers the protocol will be the Doodle Token. This token will be used for paying Snickerdoodle Subnet gas fees, paying Snickerdoodle Protocol fees, and voting in the Snickerdoodle DAO. 
-
-The Doodle Token will come in several forms to support these use cases. First, it is a native non-ERC-20 token of the Snickerdoodle subnet. This native token will be used to pay both gas and protocol fees. The second form will be an ERC-20 token, Wrapped Doodle (WDOODLE), representing votes in the DAO. The DAO itself will have a contract that can convert DOODLE and WDOODLE back and forth. Lastly, there will be vanilla ERC-20 implementations of the DOODLE on other EVM chains to enable bridging so the DOODLE can be used with other standard ERC-20 infrastructure. We will use openZepplin Libraries to implement these contracts. 
-
-
-\subsubsection{DAO}
-\label{section:ImplementationDAO}
-% general description
-% why
-%   Need decentralized way to control allowed queries, certificate authorities, allow/ban lists for known good/bad actors
-% how
-%   openzeplin curve finance
-The DAO is the decentralized governance mechanism of the Snickerdoodle Protocol. The DAO creates a decentralized way to manage allowed queries, acts as a certificate authority for the code distribution, and controls an allow/ban list of good/bad actors. The DAO will be modeled on Curve Finance's DAO (CITE) and will be implemented with OpenZepplin libraries (CITE). 
-
-\subsubsection{Queries}
-% SDQL queries (add visuals)
-% need to be content-addressed (IPFS, Arweave, etc)
-% will be published with the request for verifiability
-Queries are responsible for specifying the who, what, and why of data processing. They allow data subscribers to define who they want data from, what type of computation to run, where to send the insight, and the reward for sending the insight. These queries must be content-addressed, so anyone can access the query and verify its validity. For the initial version of the Snickerdoodle Protocol, we will be publishing these queries on IPFS. In the future, the protocol will support queries hosted through other means.
-
-TODO add info only allow queries if there are 30+ consent tokens given out
-
-\subsubsection{Network \& Fees}
-% general description
-%   One an avax subnet
-%   ARE WE SUBNET OR ON ANOTHER NETWORK
-% why
-%   Want scalability and lower fees
-%   EVM
-% how
-%   Still 
-
-% fees
-%   fee in native currency for any statechanging action we take (gas)
-%       (creating contract, consent tokens, emitting events)
-%   extra fee in DOODLEs for accessing insights
-%   rewards
-The Snickerdoodle Protocol will be deployed on the Snickerdoodle Network, which will be an EVM-compatible Avalanche Subnet. Our requirements for the network were we wanted a scalable network with low fees and EVM compatibility. Making an Avalanche Subnet fit these requirements (IDK more and IDK the how).
-
-As mentioned in \ref{section:DoodleToken}, the native token of this subnet will be the Doodle and will be used for paying fees. Within the context of the protocol and managing data, gas fees will be paid for creating consent contracts, creating consent tokens, and emitting events (i.e., SDQL queries). Data subscribers will pay additional protocol fees to emit an SDQL query to access insights. This protocol fee will be proportional to the amount of data being accessed and can be calculated using the number of consent tokens tied to a specific contract.
-
-\subsubsection{Rewards}
-% Initial version will be trust centric
-%   Get query give data, trust get reward, trust get valid data
-% Atomic swaps / escrow something to look at
-%   Simple way would be DOODLEs as only reward that this works with
-%   Future look into ZK transfers
-After sharing insights, the protocol will facilitate the transfer of rewards to the data owner. The owner can choose which wallet to send rewards to, not just the data wallet. In the initial version of the protocol, the insights/rewards transfer process will be trust-centric. When an owner responds to a query, they must trust that the business will send them the reward later. When subscribers send a reward, they need to trust that the user is sending over authentic insights. In future versions, we will enable atomic reward swaps. Atomic swaps allow insights to be shared at the same instance that a reward is received. We could easily add this functionality if the rewards are in DOODLE tokens, and zero-knowledge proofs could enable atomic swaps with different assets across chains (see \ref{section:AtomicSwaps}).
-
-\subsubsection{Privacy}
-% This is how users signal consent
-% Trade-off of public knowledge with utility
-%   Privacy of everyone knowing who's giving consent to Shrapnel
-%   Everyone knows what queries Shrapnel is interested in
-%       Potential loss of competitive edge + buisisness privacy
-%           - Reason is Philosophical argument (transparency, control, risk reduction)
-%           - Need future section about creating private query cohorts
-% Reasons why we are ok with tradeoffs made for now
-A user receiving a consent token is how users signal their consent and a business emitting an event is how they signal they are interested in a particular insight. This transparency in knowledge does come with some privacy tradeoffs:
-\begin{itemize}
-  \item Everyone knows who is giving consent to a business
-  \item Everyone knows what queries a business has run
-\end{itemize}
-
-These privacy trade-offs are acceptable for the initial version of the protocol. Our goals are to make sure users are able to give informed consent to the use of their data, data isn't revealed if this consent isn't given, insights rather than raw data are revealed if consent is given, and businesses will pay more to send queries to more people. The use of public consent tokens allows us to achieve these goals with an acceptable amount of privacy. It also gives the initial version of the protocol an interoperability bonus by allowing the consent tokens to integrate with existing web3 solutions. By making consent a public token that conforms to the ERC-721 standard, people can see what they've consented to through any application that shows owned NFTs. In a future version, we could create ways to hide this information. For example, an anonymized consent token could be minted while the data wallet listens and responds to events. %TODO maybe reference future
-
-
-It's also worth pointing out that this decision doesn't reduce the privacy of individuals too much more than if we didn't use public consent tokens. Accepting rewards linked to a business reveals that consent has been given to that business (i.e., Alice having a Bob's Business NFT means everyone knows Alice consented to provide information to Bob's Business). Additionally, there will be a limited number of subscribers for the initial release, all of which will be web3 companies. This limitation reduces the information revealed by owning a token. Holding a consent token for a particular business indicates interaction with the business and the willingness to adopt a web3 product for a reward. The former is already public knowledge by looking at the blockchain's history, and the latter is a common trait of web3 users.
-
-
-We are also ok reducing businesses' privacy by making what queries are run public. We feel that more transparency in what information businesses are interested in gives people more insight into whether they want to share their data and reduces the societal risk of companies running complex insights that hurt the commonwealth. If we need to add more privacy to businesses, we could add it in future versions by creating private query cohorts. See section \ref{section:Future} for a discussion on future changes to the protocol that can increase privacy.
-
 \subsection{Data Ingestion Provider} % name for role?
 % How we allow data subscribing and apps
 % execution role for data applications (SDQL queries)
@@ -470,14 +476,23 @@ We are also ok reducing businesses' privacy by making what queries are run publi
 %   - SDL will offer SaaS solution
 % will be the endpoint of the SDQL query for data aggregation
 % highlight that anyone can make their own
-Data ingestion is the final stage of the insight aggregation process that allows subscribers to access the insights generated at the data wallet layer. This section will detail how the subscriber can see processed data from the user's data wallet. Any entity can assume the role of data ingestion service as long as they follow the protocol and are accepted by the DAO. Snickerdoodle Labs will offer the first data ingestion provider, which will be tied to a SaaS product. 
+Data ingestion is the final stage of the insight aggregation process that allows subscribers to access the insights generated at the data wallet layer. 
+This section will detail how the subscriber can see processed data from the user's data wallet. Any entity can assume the role of data ingestion service 
+as long as they follow the protocol and are accepted by the DAO. Snickerdoodle Labs will offer the first data ingestion provider, which will be tied to 
+a SaaS product. 
 
 \subsubsection{Ingestion}
-The final step of the protocol is for data wallets to send insights from their queries to an endpoint. This endpoint is the ingestion provider and is specified in the SDQL query. Ingestion is an integral part of the protocol as it allows businesses to see the insights they have paid for.
+The final step of the protocol is for data wallets to send insights from their queries to an endpoint. This endpoint is the ingestion provider and is 
+specified in the SDQL query. Ingestion is an integral part of the protocol as it allows businesses to see the insights they have paid for.
 
 
 
-Once the ingestion provider receives the insight, it must store the insights events and manage access. They can also provide any additional services they want on top of this, such as providing a dashboard to view insights. There is no way to mathematically guarantee any ingestion provider is behaving honestly or doesn't have any bugs. The lack of a strong guarantee means that actors in the protocol have to put some trust in ingestion providers. The Snickerdoodle Protocol reduces this problem by only allowing ingestion services that the DAO has approved. Any provider has to be trustworthy enough for the DAO to vote them in; if a provider is revealed to be a bad or incompetent actor, they can be voted out. For a deeper discussion of data safety concerns with ingestion providers, see section \ref{section:IngestionDataSafety}.
+Once the ingestion provider receives the insight, it must store the insights events and manage access. They can also provide any additional services 
+they want on top of this, such as providing a dashboard to view insights. There is no way to mathematically guarantee any ingestion provider is behaving 
+honestly or doesn't have any bugs. The lack of a strong guarantee means that actors in the protocol have to put some trust in ingestion providers. The 
+Snickerdoodle Protocol reduces this problem by only allowing ingestion services that the DAO has approved. Any provider has to be trustworthy enough for 
+the DAO to vote them in; if a provider is revealed to be a bad or incompetent actor, they can be voted out. For a deeper discussion of data safety 
+concerns with ingestion providers, see section \ref{section:IngestionDataSafety}.
 
 \subsubsection{Data Safety}
 \label{section:IngestionDataSafety}
@@ -486,10 +501,15 @@ Once the ingestion provider receives the insight, it must store the insights eve
 % data security
 % leak risk
 % legal compliance
-The initial version of the protocol requires trust in the Insight Platform to maintain data safety. As discussed above, there are no guarantees that the ingestion provider acts honestly. The ingestion provider can see, delete, and sell any insights they receive. Additionally, because the initial version of the wallet only implements simple anonymization techniques, ingestion providers could identify who shared the insight and reconstruct the raw data. 
+The initial version of the protocol requires trust in the Insight Platform to maintain data safety. As discussed above, there are no guarantees that the 
+ingestion provider acts honestly. The ingestion provider can see, delete, and sell any insights they receive. Additionally, because the initial version 
+of the wallet only implements simple anonymization techniques, ingestion providers could identify who shared the insight and reconstruct the raw data. 
 
 
-To reduce these privacy risks, the initial version of the protocol will only allow queries that don't reveal PII, and future versions will add anonymization techniques to insight computations (see section \ref{section:Future}). To reduce the risk of malicious ingestion services, the Snickerdoodle DAO will maintain an allowlist of trusted actors. Additionally, Snickerdoodle Labs will be providing an ingestion service. The Snickerdoodle Ingisht Service is a SaaS product that will enforce data safety and has a massive financial and legal incentive to behave honestly.
+To reduce these privacy risks, the initial version of the protocol will only allow queries that don't reveal PII, and future versions will add anonymization 
+techniques to insight computations (see section \ref{section:Future}). To reduce the risk of malicious ingestion services, the Snickerdoodle DAO will maintain 
+an allowlist of trusted actors. Additionally, Snickerdoodle Labs will be providing an ingestion service. The Snickerdoodle Ingisht Service is a SaaS product 
+that will enforce data safety and has a massive financial and legal incentive to behave honestly.
 
 \subsubsection{SDL Insight Platform}
 \label{section:InsightService}
@@ -500,4 +520,6 @@ To reduce these privacy risks, the initial version of the protocol will only all
 %   - pinning service / content addressing
 % Dashboard / analytics
 %   Maybe plugin dashboards
-The Snickerdoodle Insight Platform will be our SaaS product offering for interaction with the Snickerdoodle Protocol. The Insight Platform will provide an ingestion service and help manage interaction with the rest of the protocol. This includes support for creating and managing queries, consent contracts, rewards, and website integrations. The Insight Platform will also provide an analytics dashboard to help businesses see their insights.
+The Snickerdoodle Insight Platform will be our SaaS product offering for interaction with the Snickerdoodle Protocol. The Insight Platform will provide an 
+ingestion service and help manage interaction with the rest of the protocol. This includes support for creating and managing queries, consent contracts, 
+rewards, and website integrations. The Insight Platform will also provide an analytics dashboard to help businesses see their insights.

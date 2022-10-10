@@ -1,33 +1,34 @@
 \begin{figure}[ht] 
     \centering
     % Define block styles
-    \tikzstyle{decision} = [diamond, draw, fill=blue!20, 
-    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
     \tikzstyle{daoblock} = [diamond, draw, fill=red!20, 
     text width=6em, text centered, rounded corners, minimum height=4em] 
     \tikzstyle{factoryblock} = [rectangle, draw, fill=blue!20, 
     text width=6em, text centered, rounded corners, minimum height=4em]
     \tikzstyle{instance} = [circle, draw, fill=violet!20, 
         text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{actorblock} = [rectangle, draw, fill=green!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]
     \tikzstyle{line} = [draw, -latex']
-    \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
-        minimum height=2em]
     
     \begin{tikzpicture}[node distance = 2cm, auto]
         % Place nodes
         \node [daoblock] (DAO) {Protocol DAO};
+        \node [actorblock, above of=DAO,  node distance=4cm] (IC) {Insight Consumer};
         \node [factoryblock, right of=DAO,  node distance=5cm] (FACTORY) {Consent Contract Factory};
         \node [instance, right of=FACTORY,  node distance=4cm] (CONTRACT2) {Consent Contract 2};
         \node [instance, above of=CONTRACT2,  node distance=3cm] (CONTRACT1) {Consent Contract 1};
         \node [instance, below of=CONTRACT2,  node distance=3cm] (CONTRACT3) {Consent Contract ...};
         % Draw edges
         \path [line] (DAO) -- node {upgrade} (FACTORY);
+        \path [line] (IC) -- node {publish} (FACTORY);
         \path [line] (FACTORY) |- node [near start, right] {deploy} (CONTRACT1);
         \path [line] (FACTORY) -- node [above] {deploy} (CONTRACT2);
         \path [line] (FACTORY) |- node [near start, right] {deploy} (CONTRACT3);
     \end{tikzpicture}
     \caption{The core of the on-chain protocol effectively implements an upgradeable, decentralized pub-sub 
-    network. Insight consumers publish consent contracts via the consent contract factory and end-users subscribe 
-    to consent contracts by claiming a non-transferable consent token.}
+    network. Insight consumers publish consent contracts via the consent contract factory which is 
+    upgradable by the Protocol DAO. The EOA which publishes a consent contract receives the 
+    DEFAULT_ADMIN_ROLE associated with that contract.}
     \label{fig:ConsentFactory}
   \end{figure}
