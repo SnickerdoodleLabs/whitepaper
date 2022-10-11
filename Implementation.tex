@@ -206,7 +206,30 @@ The query execution layer of the data wallet will parse the query definition, co
 data wallet persistence layer in a manner consistent with the conditions given by the user's on-chain permission settings (section \ref{section:UserPermissions}). This
 control flow is outlined in figure \ref{fig:InsiteControlFlow}.
 
+\paragraph{User Identity Generation via Key Ratchets}
+\label{section:UserIdentityGeneration}
+
+Users can index data from multiple EOAs or smart wallets in their data wallet. However, if they were to use these addresses directly in the participation of 
+the Protocol for consent token ownership, it would readily allow for chain analysis of user behavior and compromise user data privacy. Therefor, a data wallet
+implementation should provide key ratchet utilities to allow for the deterministic generation of new EOAs that cannot be linked back to the generating EOAs. 
+
+A ratchet is a simple machine that only allows for state increments in one direction and prevents backward traversal of the state path. Likewise, a cryptographic
+key ratchet is an algorithm that allows for the deterministic generation of new public-private key pairs in a manner that precludes the feasibility of determining
+what public-private key pairs were used in previous iterations. 
+
+\begin{algorithmic}
+  \State $i \gets 10$
+  \If{$i\geq 5$} 
+      \State $i \gets i-1$
+  \Else
+      \If{$i\leq 3$}
+          \State $i \gets i+2$
+      \EndIf
+  \EndIf 
+\end{algorithmic}
+
 \paragraph{Storage}
+\label{section:storage}
 
 Secure storage of data is crucial to allowing end users to own their data. The initial data wallet implementation produced by 
 Snickerdoodle Labs exposes a modular storage interface capable of integrating with various storage provider technologies, 
@@ -216,7 +239,8 @@ It is also important to call out the wallet's storage of public-private key pair
 and digital signatures associated with accounts linked to a user's data wallet, not private keys. 
 Instead, we integrate with existing wallets (e.g., MetaMask) for key management.
 
-\subsubsection{Collection}
+\paragraph{Data Ingestion}
+\label{section:DataIngestion}
 The data wallet will also help users own their own data by allowing them to collect the data that they generate. This individualized data mining 
 provides highly accurate data that the protocol allows users to easily monetize. The data the wallet collects has three important properties: 
 explicit/implicit, first/third party, and authenticated/unauthenticated. %Not sure if there's a better term
