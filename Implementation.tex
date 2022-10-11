@@ -60,7 +60,7 @@ A Protocol upgrade to the consent registry functionality requires that a new imp
 DAO proposal must be initiated to point the upgradeable beacon to the new implementation address. All previously deployed and newly created proxy 
 consent contracts inherit the functionality (and any new storage variables) defined in the new contract.
 
-The upgradeability pattern is based on EIP-1967 (CITE) and is implemented through OpenZeppelin libraries (CITE).
+The upgradeability pattern is based on EIP-1967 and is implemented through OpenZeppelin libraries.
 
 \subsubsection{Consent Registries}
 \label{section:ConsentContract}
@@ -76,6 +76,7 @@ be readable by most existing NFT indexing services (such as Snowtrace). Consent 
 (non-fungible token) which can be burned by the owner at any time. 
 
 \paragraph{Request for Data Events}
+\label{section:RequestForData}
 
 After an organization has published a consent registry via the Consent Contract Factory (see \ref{section:ConsentFactory}), the organization can emit
 EVM events by calling a special function, $requestForData$, which takes a content identifier (CID) as its only input. This CID is used to 
@@ -89,6 +90,7 @@ to a later blocknumber (but cannot be changed to an earlier block number). Setti
 only allow for query filters to search a limited history of the chain.
 
 \paragraph{User Data Permissioning}
+\label{section:UserPermissions}
 
 A $requestForData$ event indicate that it requires access to multiple attributes indexed by the user's data wallet client, such as country of origin, age,
 on-chain contracts they have interacted with using their linked EOA asset account. However, users can set granular permissions regarding their indexed data 
@@ -115,10 +117,13 @@ The Web3 popup protocol can be extended to other environments including mobile b
 figure \ref{fig:PopupProtocol}. The user flows presented by these tamper-resistant popups serve as the on-boarding mechanism for end-user's to opt into a data pool.
 
 \paragraph{Opt-In methods and Meta-Transactions}
+\label{section:OptInMethods}
 
-The consent registries have to modes by which user's can join a data pool: open-access and invite-only. Consent registries in which open-access is 
+The consent registries have two modes by which users can join a data pool: open-access and invite-only. Consent registries in which open-access is 
 enabled ($openOptInDisabled$ is $false$), any EOA is allowed to claim a consent token by calling the $optIn$ method and paying the associated gas
-fees. Registries where $openOptInDisabled$ is $true$ are invite only and require a signature for an EOA with the $SIGNER\_ROLE$ in order to join 
+fees. 
+
+Registries where $openOptInDisabled$ is $true$ are invite only and require a signature for an EOA with the $SIGNER\_ROLE$ in order to join 
 a data pool. There are two available methods for invitation-only user opt-in: $restrictedOptIn$ and $anonymousRestrictedOptIn$. The former method
 requires that the recipient EOA be known in advance by the $SIGNER\_ROLE$ in order to construct the appropriate signature. The receiving EOA then 
 becomes the only account that can call $restrictedOptIn$ with that signature. If the recipient EOA address is not known ahead of time, the $SIGNER\_ROLE$
@@ -161,43 +166,54 @@ Token holders (see section \ref{section:Token}), are responsible for the creatio
 token will render one vote, though this too could be modified via a DAO proposal. Token holders will have to reach a pre-specified quorum of voting power in 
 order to successfully create a proposal in the DAO task queue. Successful proposals will be subject to a delay of at least one block before they can be executed 
 in order to prevent flash loan attacks. 
-
 %----------------------------------------------------------------------------------------------------------------------------------------
-\subsection{Data wallet}
+\subsection{Off-Chain Components}
+\label{section:OffChain}
+
+\subsubsection{Data Wallet}
 \label{section:DataWallet}
 
 \input{DataWalletStructureTikz}
 
-\input{InsightControlFLowTikz}
+The data wallet is the primary client interface for end users to interact with the Protocol. It enables data ownership by facilitating user control 
+and consent to the collection, storage, and usage of their data. The data wallet should provide the following functionality (as indicated 
+by figure \ref{fig:DataWalletStructure}):
 
-The data wallet is the primary end-user client interface within the Protocol. It enables data ownership by facilitating user control 
-and consent to the collection, storage, and usage of their data. The data wallet should provide the following functionality:
 \begin{itemize}
+  \item Ingestion and indexing of user data from the data wallet client deployment environment
+  \item Identity and verifiable credential generation/management
+  \item Query/Reward discovery and management
+  \item A query engine for individualized data mining, insight processing and delivery
+  \item A consent management interface and granular access control
   \item Secure storage of the data
-  \item A query engine for individualized data mining
-  \item Aggregation and indexing of user data. This should include on-chain data, data from traditional third-party sources, or digital identities.
-  \item A consent management interface for granular access control
-  \item Localized insight processing and submission
-  \item Reward discovery and management
-  \item Identity and verifiable credential management
 \end{itemize}
 
 To the user, the data wallet operates in a conceptually similar way to a conventional cryptocurrency wallet, but with a wider scope. 
 Instead of key and account management of a blockchain account, a data wallet manages the storage, collection, and sharing of insights derived 
-from user data. The initial form factor will be a stand-alone browser extension with plans to expand the form factor in future versions (see 
-section \ref{section:FormFactor}). By providing this localized control interface, the data wallet will give individuals greater control 
-of their own data and allow for participation in the Protocol.
+from user data. Data wallet functionality is form-factor agnostic (see section \ref{section:FormFactor}). However, browser extension and 
+mobile applications are anticipated to be the primary channels for use.
 
-\subsubsection{Storage}
+\paragraph{User Data Aquisition Control Flow}
+\label{section:AquisitionControlFlow}
 
-Secure storage of data is crucial to allowing people to own their data. The initial data wallet implementation produced by 
-Snickerdoodle Labs will expose a modular storage interface capable of integrating with various storage provider technologies, 
+\input{InsightControlFLowTikz}
+
+The acquisition of insights from the data network begins at the consent contract factory (see section \ref{section:ConsentFactory}) where an organization 
+publishes a consent registry. Data wallets belonging to end users, who have claimed a consent token via an invitation flow (section \ref{section:ConsentInvitations}),
+detect $requestForData$ events from the associated consent registry. The event will reveal a CID which resolves to query definition file (section \ref{section:RequestForData}). 
+The query execution layer of the data wallet will parse the query definition, construct the associated abstract syntax tree (AST), and apply the logic to the
+data wallet persistence layer in a manner consistent with the conditions given by the user's on-chain permission settings (section \ref{section:UserPermissions}). This
+control flow is outlined in figure \ref{InsiteControlFlow}.
+
+\paragraph{Storage}
+
+Secure storage of data is crucial to allowing end users to own their data. The initial data wallet implementation produced by 
+Snickerdoodle Labs exposes a modular storage interface capable of integrating with various storage provider technologies, 
 such as Google Storage, Amazon S3, or decentralized options like the Ceramic Network.
 
 It is also important to call out the wallet's storage of public-private key pairs. A data wallet should only store public keys 
 and digital signatures associated with accounts linked to a user's data wallet, not private keys. 
 Instead, we integrate with existing wallets (e.g., MetaMask) for key management.
-
 
 \subsubsection{Collection}
 The data wallet will also help users own their own data by allowing them to collect the data that they generate. This individualized data mining 

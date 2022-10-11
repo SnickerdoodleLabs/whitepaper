@@ -14,14 +14,14 @@
     \node [block, below of=identify] (evaluate) {Query Evaluation};
     \node [block, below of=evaluate, node distance=2.5cm] (permissions) {Permission Resolution};
     \node [block, below of=permissions, node distance=2.5cm] (data) {Persistence Layer Access};
-    \node [cloud, right of=data] (AS) {Aggregation Service};
+    \node [cloud, right of=evaluate] (AS) {Aggregation Service};
     % Draw edges
     \path [line] (CC) -- node {requestForData event} (identify);
     \path [line] (identify) -- node {CID resolution and query fetch} (evaluate);
     \path [line] (evaluate) -- node {AST Evaluation} (permissions);
     \path [line] (permissions) -- node {read only access} (data);
     \path [line,dashed] (CCF) -- (CC);
-    \path [line,dashed] (data) -- (AS);
+    \path [line,dashed] (evaluate) -- (AS);
 \end{tikzpicture}
     \caption{Control Flow from requesting to receiving an insight from the data wallet network.}
     \label{fig:InsiteControlFlow}
