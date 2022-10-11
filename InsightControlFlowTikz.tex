@@ -2,21 +2,32 @@
     \centering
     \tikzstyle{decision} = [diamond, draw, fill=blue!20,
         text width=4.5em, text badly centered, node distance=2.5cm, inner sep=0pt]
-    \tikzstyle{block} = [rectangle, draw, fill=blue!20,
+    \tikzstyle{instance} = [circle, draw, fill=violet!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]   
+    \tikzstyle{dwblock} = [rectangle, draw, fill=green!20,
         text width=5em, text centered, rounded corners, minimum height=4em]
     \tikzstyle{line} = [draw, very thick, color=black!50, -latex']
     \tikzstyle{linesansserif} = [draw, very thick, color=black!50, latex']
-    \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=4.5cm, auto]
+    \tikzstyle{factoryblock} = [rectangle, draw, fill=blue!20, 
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{aggregator} = [cylinder, 
+        draw = violet, 
+        text = black,
+        cylinder uses custom fill, 
+        cylinder body fill = magenta!10, 
+        cylinder end fill = magenta!40,
+        aspect = 0.2, 
+        shape border rotate = 90]
     \tikzstyle{coord} = [coordinate, on chain, on grid, node distance=2cm]
     \begin{tikzpicture}[scale=4, node distance = 3cm, auto]
         % Place nodes
-        \node [block] (CC) {Consent Contract};
-        \node [cloud, left of=CC] (CCF) {Contract Factory};
-        \node [block, below of=CC] (identify) {Event Detection};
-        \node [block, below of=identify] (evaluate) {Query Evaluation};
-        \node [block, below of=evaluate, node distance=2.5cm] (permissions) {Permission Resolution};
-        \node [block, below of=permissions, node distance=2.5cm] (data) {Persistence Layer Access};
-        \node [cloud, right of=evaluate] (AS) {Aggregation Service};
+        \node [instance] (CC) {Consent Contract};
+        \node [factoryblock, left of=CC, node distance=4cm] (CCF) {Contract Factory};
+        \node [dwblock, below of=CC] (identify) {Event Detection};
+        \node [dwblock, below of=identify] (evaluate) {Query Evaluation};
+        \node [dwblock, below of=evaluate, node distance=2.5cm] (permissions) {Permission Resolution};
+        \node [dwblock, below of=permissions, node distance=2.5cm] (data) {Persistence Layer Access};
+        \node [aggregator, right of=evaluate, node distance=5cm] (AS) {Aggregation Service};
         \node [coord, left of=data]  (asdf)  {}; \cmark{4}
         % Draw edges
         \path [line] (CC) -- node {requestForData event} (identify);
