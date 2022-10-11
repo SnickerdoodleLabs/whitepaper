@@ -1,33 +1,33 @@
 \begin{figure*}[!htb] 
     \centering
     \tikzstyle{decision} = [diamond, draw, fill=blue!20,
-    text width=4.5em, text badly centered, node distance=2.5cm, inner sep=0pt]
-\tikzstyle{block} = [rectangle, draw, fill=blue!20,
-    text width=5em, text centered, rounded corners, minimum height=4em]
-\tikzstyle{line} = [draw, very thick, color=black!50, -latex']
-\tikzstyle{linesansserif} = [draw, very thick, color=black!50, latex']
-\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=4.5cm, auto]
-\tikzstyle{coord} = [coordinate, on chain, on grid, node distance=2cm]
-\begin{tikzpicture}[scale=4, node distance = 3cm, auto]
-    % Place nodes
-    \node [block] (CC) {Consent Contract};
-    \node [cloud, left of=CC] (CCF) {Contract Factory};
-    \node [block, below of=CC] (identify) {Event Detection};
-    \node [block, below of=identify] (evaluate) {Query Evaluation};
-    \node [block, below of=evaluate, node distance=2.5cm] (permissions) {Permission Resolution};
-    \node [block, below of=permissions, node distance=2.5cm] (data) {Persistence Layer Access};
-    \node [cloud, right of=evaluate] (AS) {Aggregation Service};
-    \node [coord, left of=data]  (asdf)  {}; \cmark{4}
-    % Draw edges
-    \path [line] (CC) -- node {requestForData event} (identify);
-    \path [line] (identify) -- node {CID resolution and query fetch} (evaluate);
-    \path [line] (evaluate) -- node {AST Evaluation} (permissions);
-    \path [line] (permissions) -- node {read only access} (data);
-    \path [linesansserif] (data) -- (asdf);
-    \path [line] (asdf) |- node [near start,left] {query results} (evaluate);
-    \path [line,dashed] (CCF) -- (CC);
-    \path [line,dashed] (evaluate) -- (AS);
-\end{tikzpicture}
+        text width=4.5em, text badly centered, node distance=2.5cm, inner sep=0pt]
+    \tikzstyle{block} = [rectangle, draw, fill=blue!20,
+        text width=5em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{line} = [draw, very thick, color=black!50, -latex']
+    \tikzstyle{linesansserif} = [draw, very thick, color=black!50, latex']
+    \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=4.5cm, auto]
+    \tikzstyle{coord} = [coordinate, on chain, on grid, node distance=2cm]
+    \begin{tikzpicture}[scale=4, node distance = 3cm, auto]
+        % Place nodes
+        \node [block] (CC) {Consent Contract};
+        \node [cloud, left of=CC] (CCF) {Contract Factory};
+        \node [block, below of=CC] (identify) {Event Detection};
+        \node [block, below of=identify] (evaluate) {Query Evaluation};
+        \node [block, below of=evaluate, node distance=2.5cm] (permissions) {Permission Resolution};
+        \node [block, below of=permissions, node distance=2.5cm] (data) {Persistence Layer Access};
+        \node [cloud, right of=evaluate] (AS) {Aggregation Service};
+        \node [coord, left of=data]  (asdf)  {}; \cmark{4}
+        % Draw edges
+        \path [line] (CC) -- node {requestForData event} (identify);
+        \path [line] (identify) -- node {CID resolution and query fetch} (evaluate);
+        \path [line] (evaluate) -- node {AST Evaluation} (permissions);
+        \path [line] (permissions) -- node {read only access} (data);
+        \path [linesansserif] (data) -- (asdf);
+        \path [line] (asdf) |- node [near start,left] {query results} (evaluate);
+        \path [line,dashed] (CCF) -- (CC);
+        \path [line,dashed] (evaluate) -- (AS);
+    \end{tikzpicture}
     \caption{Control Flow from requesting to receiving an insight from the data wallet network.}
     \label{fig:InsiteControlFlow}
   \end{figure*}
