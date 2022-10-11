@@ -86,7 +86,7 @@ past $requestForData$ events by constructing EVM query filters and requesting al
 tamper-resistant communication layer between organizations and participants in their data pools. See figure \ref{fig:OnChainOffChain}
 
 Consent registries also specify a $queryHorizon$ which inform data wallets of the oldest block number to search for these events. This variable is 
-first initialized to the block number that the proxy contract was deployed from the contract factory and can be updated by an EOA with the $DEFAULT\_ADMIN\ROLE$
+first initialized to the block number that the proxy contract was deployed from the contract factory and can be updated by an EOA with the $DEFAULT\_ADMIN\_ROLE$
 to a later blocknumber (but cannot be changed to an earlier block number). Setting a reasonable value for $queryHorizon$ is important since many RPC providers
 only allow for query filters to search a limited history of the chain.
 
@@ -204,7 +204,7 @@ publishes a consent registry. Data wallets belonging to end users, who have clai
 detect $requestForData$ events from the associated consent registry. The event will reveal a CID which resolves to query definition file (section \ref{section:RequestForData}). 
 The query execution layer of the data wallet will parse the query definition, construct the associated abstract syntax tree (AST), and apply the logic to the
 data wallet persistence layer in a manner consistent with the conditions given by the user's on-chain permission settings (section \ref{section:UserPermissions}). This
-control flow is outlined in figure \ref{InsiteControlFlow}.
+control flow is outlined in figure \ref{fig:InsiteControlFlow}.
 
 \paragraph{Storage}
 
