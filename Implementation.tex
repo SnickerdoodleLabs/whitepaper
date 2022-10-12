@@ -1,7 +1,7 @@
 \section{Implementation}
 \label{section:Implementation}
 %------------------------------------------------------------------------------------------
-\subsection{Architecture}
+\subsection{Architecture Abstract}
 \label{section:Architecture}
 
 This section will discuss the implementation and design decisions of the Protocol. The Protocol has three primary 
@@ -168,7 +168,7 @@ token will render one vote, though this too could be modified via a DAO proposal
 order to successfully create a proposal in the DAO task queue. 
 
 Proposals will be subject to a delay of at least one block before voting begins as well as before a queued proposed can be executed 
-in order to prevent flash loan attacks. Voters who initiate a proposal and subsequently relinquish their voting power by either selling their tokens or have their voting power revoked may have their proposal canceled if their remaining voting power is below the quorum threshold. The life-cycle of a DAO proposal is outlined in figure \ref{fig:ProposalLifecycle}.
+in order to prevent flash loan attacks. Voters who initiate a proposal and subsequently relinquish their voting power by either selling their tokens or have their voting power revoked may have their proposal canceled if their remaining voting power is below the quorum threshold. The lifecycle of a DAO proposal is outlined in figure \ref{fig:ProposalLifecycle}.
 %----------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Off-Chain Components}
 \label{section:OffChain}
@@ -220,20 +220,22 @@ key ratchet is an algorithm that allows for the deterministic generation of new 
 what public-private key pairs were used in previous iterations. Cryptographic ratchet algorithms are widely used in consumer-facing private messaging applications
 
 \begin{algorithm}
-\caption{Key Ratchet Pseudo-code}
+\caption{Key Ratchet Proto-algorithm}
 \label{alg:KeyRatchet}
     \begin{algorithmic}
-        \Require EOA with message signing utility
+        \Require EOA with message signing utility, Seed Message
         \Ensure New EOA with no prior transaction history
-        \State Entropy $\gets$ EOA.signMessage(Pre-determined Message)
-        \State new EOA $\gets$ HMAC-SHA256(Entropy)
-        \State return new EOA
+        \State Seed Message Signature $\gets$ EOA.signMessage(Seed Message)
+        \State new EOA $\gets$ pbkdf2sync(Seed Message Signature, EOA public address, 100000, 32, sha256)
+        \State \textbf{return} new EOA
     \end{algorithmic}
 \end{algorithm}
 
-Procedure \ref{alg:KeyRatchet} outlines the a simple technique to generate a new key from the message signing utility exposed from most consumer crypto-wallets. This 
+Procedure \ref{alg:KeyRatchet} outlines a simple technique, leveraging the Password-Based Key Derivation Function 2 (pbkdf2sync), to generate a new public-private key pair from the message signing utility exposed from most consumer crypto-wallets. This 
 algorithm, used in conjunction with the Crumbs contract, described in section \ref{section:Crumbs}, can be used to enhance user data privacy by preventing the cross-referencing of linked EOAs on-chain while at the same time offering an improved user
-experience. Specifically, by using the key ratchet algorithm to derive a dedicated in-memory key pair for consent, the data wallet form factor can sign metatransactions (see section \ref{section:OptInMethods}) without multiple prompts from various wallet applications. Additionally, using derived EOAs for consent provides an additional layer of security for end user's, keeping their valuable asset-holding EOAs separate from those
+experience. 
+
+Specifically, by using the key ratchet algorithm to derive a dedicated in-memory key pair for consent, the data wallet form factor can sign metatransactions (see section \ref{section:OptInMethods}) without multiple prompts from various wallet applications. Additionally, using derived EOAs for consent provides an additional layer of security for end user's, keeping their valuable asset-holding EOAs separate from those
 used for participating in various data pools. 
 
 \paragraph{Storage}
@@ -273,11 +275,11 @@ user imports their name from the DMV, that would be third-party data.
 
 
 \paragraph{Authenticated/Unauthenticated}
-Data can be authenticated if its origin and validity can be verified through cryptographic means and unauthenticated if it can't. For example, 
-a wallet address can be authenticated if we receive a signed message from that address. Third-party data can be authenticated if it has a known 
-identity (e.g., the DMV's public key is known, and the data wallet receives data signed by that key). 
+Data can be authenticated if its origin and validity can be verified through cryptographic means and unauthenticated if no such mechanism exists. For example, 
+a wallet address can be authenticated via a signed message signature verification. Third-party data can be authenticated if it has a known 
+credential authority (this is the fundamental operating principal of certificate authorities like Digicert). 
 
-\subsubsection{Localized Processing} % listens to events and processes queries
+\paragraph{Localized Processing} % listens to events and processes queries
 
 The data wallet is a local application that stores the owner's data securely and processes computations locally. By collecting and 
 securely storing user data locally, the data wallet guarantees data ownership to the user by never sharing it. Because computations 
@@ -292,10 +294,10 @@ user has opted into, the data wallet will process the data following the rules i
 has been completed, the data wallet will send the insights to the specified endpoint, and the data owner will collect any rewards.
 
 
-\subsubsection{Snickerdoodle Query Language} % maybe move to contracts 
+\subsubsection{Protocol Query Language} % maybe move to contracts 
 \label{section:SDQL}
 
-The Snickerdoodle Query Language will allow businesses to share their data requests with individual users in a transparent and auditable fashion. 
+The Protocol specifies a simple query language which will allow businesses to broadcast conditional data requests to consent registry cohorts in a transparent and interpretable fashion. 
 It will be structured as a simple JSON file containing information on the eligibility requirements, rewards, data to be collected, what processing 
 to perform, and where to send processed data (see figure TODO). The allowed functions and syntax of the language will be enforced by the 
 Snickerdoodle DAO and determined by token holders, which will allow for its continued development and the enforcement of user privacy. SDQL 
@@ -303,8 +305,7 @@ queries must be stored on a content-addressable distributed network, such as IPF
 
 TODO FIGURE SHOWING QUERY + flesh out sections
 
-
-\subsubsection{Rewards}
+\paragraph{Rewards}
 
 An essential part of the protocol is allowing individuals to get value from their rewards. The data wallet will facilitate this by allowing users 
 to gain rewards for sharing their data. First, the data wallet helps people find rewards that are being offered. If a person goes to a website 
@@ -316,96 +317,14 @@ Once the user has given consent to share data, the data wallet will also help th
 be able to visualize the rewards offered in that query. The owner will also be able to set which addresses and chains they want to receive rewards. 
 Additionally, the owner will be able to see the history of the rewards they've received and the data exchanged. 
 
-\subsubsection{Authorization and Consent Management}
-
-Enabling informed consent for data sharing is a core function of the Snickerdoodle Protocol. Consent is accomplished through the use of consent contracts 
-(see section \ref{section:Contracts}). When a user wishes to consent to share data, they make a contract call and are issued a non-transferable consent 
-token. To revoke consent, they can burn that token. The data wallet facilitates this by giving the owner's crypto wallet the appropriate transactions to 
-sign. Once opted in, the data wallet will respond to all eligible queries from that pool unless more granular data permissions have been specified within 
-the wallet. TODO granular permissions
-%TODO granular permissions and opting out
-
-
-For the initial version of the Snickerdoodle Protocol, we are not allowing users to choose what types of queries they can opt in and out of. A user giving 
-consent to a company allows that company to run any query on their data. However, to maintain privacy, we limit queries' interactions with PII. If any 
-queries touch-sensitive data, we will reduce the resolution of the insight, e.g., location data will only reveal the state or country, not the zip code. 
-Additionally, part of the design of the data wallet is that it has the final say on what data is shared. Even if a user consents to a consent contract, a 
-data wallet can theoretically choose not to respond, making it easy for future versions of the wallet to enable more granular privacy controls.
-
-\subsubsection{Distributed Runtime Library}
-
-The distributed runtime library is a core security feature of the data wallet. The wallet browser plugin will leverage iFrames to run plugins for data 
-processing and wallet integrations. Using iFrames like this will isolate the data wallet's processing from the browser. To ensure the validity of these 
-plugins, we will use the iFrame to enforce the legitimacy of the code by verifying certificates and checksums with the DAO allowlist. In this way, the 
-user has a trustless way to verify their data is being processed and held safely.
-
-\subsubsection{Queries}
-
-Queries are responsible for specifying the who, what, and why of data processing. They allow data subscribers to define who they want data from, what type 
-of computation to run, where to send the insight, and the reward for sending the insight. These queries must be content-addressed, so anyone can access the 
-query and verify its validity. For the initial version of the Snickerdoodle Protocol, we will be publishing these queries on IPFS. In the future, the protocol 
-will support queries hosted through other means.
-
-TODO add info only allow queries if there are 30+ consent tokens given out
-
-\subsubsection{Network \& Fees}
-
-The Snickerdoodle Protocol will be deployed on the Snickerdoodle Network, which will be an EVM-compatible Avalanche Subnet. Our requirements for the 
-network were we wanted a scalable network with low fees and EVM compatibility. Making an Avalanche Subnet fit these requirements (IDK more and IDK the how).
-
-As mentioned in \ref{section:DoodleToken}, the native token of this subnet will be the Doodle and will be used for paying fees. Within the context 
-of the protocol and managing data, gas fees will be paid for creating consent contracts, creating consent tokens, and emitting events (i.e., SDQL queries). 
-Data subscribers will pay additional protocol fees to emit an SDQL query to access insights. This protocol fee will be proportional to the amount of data 
-being accessed and can be calculated using the number of consent tokens tied to a specific contract.
-
-\subsubsection{Rewards}
-
-After sharing insights, the protocol will facilitate the transfer of rewards to the data owner. The owner can choose which wallet to send rewards to, not 
-just the data wallet. In the initial version of the protocol, the insights/rewards transfer process will be trust-centric. When an owner responds to a 
-query, they must trust that the business will send them the reward later. When subscribers send a reward, they need to trust that the user is sending 
-over authentic insights. In future versions, we will enable atomic reward swaps. Atomic swaps allow insights to be shared at the same instance that a 
-reward is received. We could easily add this functionality if the rewards are in DOODLE tokens, and zero-knowledge proofs could enable atomic swaps 
-with different assets across chains (see \ref{section:AtomicSwaps}).
-
-\subsubsection{Privacy}
-
-A user receiving a consent token is how users signal their consent and a business emitting an event is how they signal they are interested in a particular 
-insight. This transparency in knowledge does come with some privacy tradeoffs:
-\begin{itemize}
-  \item Everyone knows who is giving consent to a business
-  \item Everyone knows what queries a business has run
-\end{itemize}
-
-These privacy trade-offs are acceptable for the initial version of the protocol. Our goals are to make sure users are able to give informed consent to the 
-use of their data, data isn't revealed if this consent isn't given, insights rather than raw data are revealed if consent is given, and businesses will pay 
-more to send queries to more people. The use of public consent tokens allows us to achieve these goals with an acceptable amount of privacy. It also gives 
-the initial version of the protocol an interoperability bonus by allowing the consent tokens to integrate with existing web3 solutions. By making consent a 
-public token that conforms to the ERC-721 standard, people can see what they've consented to through any application that shows owned NFTs. In a future 
-version, we could create ways to hide this information. For example, an anonymized consent token could be minted while the data wallet listens and responds 
-to events. %TODO maybe reference future
-
-
-It's also worth pointing out that this decision doesn't reduce the privacy of individuals too much more than if we didn't use public consent tokens. Accepting 
-rewards linked to a business reveals that consent has been given to that business (i.e., Alice having a Bob's Business NFT means everyone knows Alice consented 
-to provide information to Bob's Business). Additionally, there will be a limited number of subscribers for the initial release, all of which will be web3 
-companies. This limitation reduces the information revealed by owning a token. Holding a consent token for a particular business indicates interaction with 
-the business and the willingness to adopt a web3 product for a reward. The former is already public knowledge by looking at the blockchain's history, and the 
-latter is a common trait of web3 users.
-
-
-We are also ok reducing businesses' privacy by making what queries are run public. We feel that more transparency in what information businesses are interested 
-in gives people more insight into whether they want to share their data and reduces the societal risk of companies running complex insights that hurt the 
-commonwealth. If we need to add more privacy to businesses, we could add it in future versions by creating private query cohorts. See section \ref{section:Future} 
-for a discussion on future changes to the protocol that can increase privacy.
-
-\subsection{Aggregation Services} % name for role?
+\subsubsection{Aggregation Services} % name for role?
 
 Data ingestion and aggregation is the final stage of the insight aggregation process that allows subscribers to access the insights generated at the data wallet layer. 
 This section will detail how the subscriber can see processed data from the user's data wallet. Any entity can assume the role of data ingestion service 
 as long as they follow the protocol and are accepted by the DAO. Snickerdoodle Labs will offer the first data ingestion provider, which will be tied to 
 a SaaS product. 
 
-\subsubsection{Ingestion}
+\paragraph{Insight Ingestion}
 The final step of the protocol is for data wallets to send insights from their queries to an endpoint. This endpoint is the ingestion provider and is 
 specified in the SDQL query. Ingestion is an integral part of the protocol as it allows businesses to see the insights they have paid for.
 
@@ -416,7 +335,7 @@ Snickerdoodle Protocol reduces this problem by only allowing ingestion services 
 the DAO to vote them in; if a provider is revealed to be a bad or incompetent actor, they can be voted out. For a deeper discussion of data safety 
 concerns with ingestion providers, see section \ref{section:IngestionDataSafety}.
 
-\subsubsection{Data Safety}
+\paragraph{Data Safety}
 \label{section:IngestionDataSafety}
 
 The initial version of the protocol requires trust in the Insight Platform to maintain data safety. As discussed above, there are no guarantees that the 
@@ -429,7 +348,7 @@ techniques to insight computations (see section \ref{section:Future}). To reduce
 an allowlist of trusted actors. Additionally, Snickerdoodle Labs will be providing an ingestion service. The Snickerdoodle Ingisht Service is a SaaS product 
 that will enforce data safety and has a massive financial and legal incentive to behave honestly.
 
-\subsubsection{SDL Insight Platform}
+\paragraph{SDL Insight Platform}
 \label{section:InsightService}
 
 The Snickerdoodle Insight Platform will be our SaaS product offering for interaction with the Snickerdoodle Protocol. The Insight Platform will provide an 
