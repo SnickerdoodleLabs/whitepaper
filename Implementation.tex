@@ -32,7 +32,7 @@ data wallet client or act as an aggregation service provider if the specificatio
 \label{section:ConsentFactory}
 
 \input{ConsentContractPubSubTikz}
-The on-chain components of the Protocol functions as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
+The on-chain components of the Protocol function as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
 in which organizations publish new instances of an EIP-721 compatible consent registry (see \ref{section:ConsentContract}), and end-users 
 subscribe to the registries by claiming a non-transferrable consent token. The publishing action is performed via the Protocol's upgradable 
 consent contract factory, see figure \ref{fig:ConsentFactory}. The factory contract will be the entrypoint to the Protocol for new insight 
@@ -41,7 +41,7 @@ consumers, since a consent registry is required to communicate with the network 
 \input{ContractUpgradePatternTikz}
 The consent contract factory exists as a utility for insight consumers to create new consent registries. The factory is implemented with an 
 upgradable beacon pattern, see figure \ref{fig:UpgradePattern} to enable gas-efficient deployments and to allow for seamless extensions of functionality
-via DAO proposals. 
+via DAO proposals (see sections \ref{section:ImplementationDAO} and \ref{section:Governance}) . 
 
 \paragraph{Factory Pattern}
 The factory pattern defines a smart contract which is responsible for creating other contracts. The Protocol uses the factory 
@@ -51,9 +51,9 @@ pattern to simplify the deployment of new consent registries and to give new ins
 \label{section:BeaconPattern}
 
 Consent registries are deployed as proxy contract instances that reference an upgradable beacon contract to obtain the correct address to delegate
-function calls, see \ref{fig:UpgradePattern}. This upgrade pattern compliments the factory pattern by allowing for very gas-efficient deployments 
+function calls, see figure \ref{fig:UpgradePattern}. This upgrade pattern compliments the factory pattern by allowing for very gas-efficient deployments 
 of new proxy instances. Proxy contracts only store storage variables and a pointer to their designated upgradable beacon contract. The upgradable 
-beacon contract points to an implementation contract. The implementation contract contains all functions implementations as well as the storage
+beacon contract points to an implementation contract. The implementation contract contains all function implementations as well as the storage
 variable declarations that proxy contracts copy. 
 
 A Protocol upgrade to the consent registry functionality requires that a new implementation contract first be deployed to the blockchain. Then a 
@@ -73,31 +73,30 @@ have given consent to participate in the data pool.
 
 Consent registries expose an EIP-721 compatible interface. This is for developer integration convenience as it allows consent registries to 
 be readable by most existing NFT indexing services (such as Snowtrace). Consent is denoted by ownership of a non-transferrable consent NFT 
-(non-fungible token) which can be burned by the owner at any time. 
+(non-fungible token) which can be burned by the NFT owner at any time. 
 
-\paragraph{Request for Data Events}
+\paragraph{Request-for-Data Events}
 \label{section:RequestForData}
-
 
 After an organization has published a consent registry via the Consent Contract Factory (see \ref{section:ConsentFactory}), the organization can emit
 EVM events by calling a special function, $requestForData$, which takes a content identifier (CID) as its only input. This CID is used to 
-retrieve the request specifications from a suitable content addressable network (like IPFS) that the data wallets will process. Data wallets can detect 
+retrieve the request specifications from a suitable content addressable network (like IPFS) that the data wallets will process (see section \ref{section:AquisitionControlFlow}). Data wallets can detect 
 past $requestForData$ events by constructing EVM query filters and requesting all EVM logs that match those filters. Thus consent registries offer a 
 tamper-resistant communication layer between organizations and participants in their data pools. See figure \ref{fig:OnChainOffChain}
 
 Consent registries also specify a $queryHorizon$ which inform data wallets of the oldest block number to search for these events. This variable is 
-first initialized to the block number that the proxy contract was deployed from the contract factory and can be updated by an EOA with the $DEFAULT\_ADMIN\_ROLE$
+first initialized to the block number of the proxy contract deployment from the contract factory and can be updated by an EOA with the $DEFAULT\_ADMIN\_ROLE$
 to a later blocknumber (but cannot be changed to an earlier block number). Setting a reasonable value for $queryHorizon$ is important since many RPC providers
-only allow for query filters to search a limited history of the chain.
+only allow for query filters to search a limited history of the blockchain.
 
 \paragraph{User Data Permissioning}
 \label{section:UserPermissions}
 
-A $requestForData$ event indicate that it requires access to multiple attributes indexed by the user's data wallet client, such as country of origin, age,
+A $requestForData$ event can indicate that it requires access to multiple attributes indexed by the user's data wallet client, such as country of origin, age,
 on-chain contracts they have interacted with using their linked EOA asset account. However, users can set granular permissions regarding their indexed data 
 attributes. 
 
-Every consent token issued from a consent registry has an associated set of binary $aggreementFlags$. There are 256 flags in total (the size of an EVM word) 
+Every consent token issued from a consent registry has an associated set of binary $agreementFlags$. There are 256 flags in total (the size of an EVM word) 
 though not all flags will be assigned to specific attributes at Protocol launch, leaving room for customization. Only the owner of a consent token can 
 update the granular permissions denoted by the token's $agreementFlag$s. The availability of granular consent data on-chain allows organizations to better 
 understand what kinds of insights they will be able to obtain from their data pool before calling $requestForData$. 
@@ -105,10 +104,9 @@ understand what kinds of insights they will be able to obtain from their data po
 \paragraph{Consent Invitations}
 \label{section:ConsentInvitations}
 
-
 Consent registry metadata is used for the decentralized, trustless, and tamper-resistant triggering of user flows that should be presented to the data wallet 
 end user in a format appropriate for the data wallet client environment. In a web browser setting, the data wallet detects the current active URL, and via DNS 
-over HTTPS (DoS) queries the TXT records associated with the apex domain. If the TXT record contains a reference to a Protocol consent 
+over HTTPS (DoH) queries the TXT records associated with the apex domain. If the TXT record contains a reference to a Protocol consent 
 contract address, the data wallet then fetches the URLs registered in the consent registry $domains$ metadata storage variable and cross-references the domains 
 listed from the contract to the current URL. If the data wallet detects that the current URL is included in the domains listed in the 
 consent contract, the data wallet will inject a user flow into the browser DOM. The content of the user-flow is fetched from the URL specified by the consent 
@@ -124,19 +122,20 @@ The consent registries have two modes by which users can join a data pool: open-
 enabled ($openOptInDisabled$ is $false$), any EOA is allowed to claim a consent token by calling the $optIn$ method and paying the associated gas
 fees. 
 
-Registries where $openOptInDisabled$ is $true$ are invite only and require a signature for an EOA with the $SIGNER\_ROLE$ in order to join 
-a data pool. There are two available methods for invitation-only user opt-in: $restrictedOptIn$ and $anonymousRestrictedOptIn$. The former method
+Registries where $openOptInDisabled$ is $true$ are invitation only and require a signature for an EOA with the $SIGNER\_ROLE$ in order to join 
+the data pool associated with a consent registry. There are two available methods for invitation-only user opt-in: $restrictedOptIn$ and $anonymousRestrictedOptIn$. 
+
+The former method
 requires that the recipient EOA be known in advance by the $SIGNER\_ROLE$ in order to construct the appropriate signature. The receiving EOA then 
 becomes the only account that can call $restrictedOptIn$ with that signature. If the recipient EOA address is not known ahead of time, the $SIGNER\_ROLE$
-can construct a signature for use with the $anonymousRestrictedOptIn$ method in which any EOA can submit the signature to that method (a single time) 
-in order to opt-in. 
+can construct a signature for use with the $anonymousRestrictedOptIn$ method in which any EOA can submit the signature to that method in order to opt-in. Once a signature that was constructed for use with either invite only method is used, it cannot be used a second time. 
 
 Support for both open and invitation-only opt-in flows makes the Protocol flexible to a variety of use-cases. However, end users are often hesitant to 
 spent their own cryptocurrency in order to pay for transaction fees associated with a decentralized application or simply do not have the tokens 
 necessary to do so. Additionally, requiring the user to spend their own assets to participate in the Protocol intoduces significant user friction and
 adoption hurdles. Consent registries implement EIP-2772 compatible metatransaction capabilities to circumvent this issue. 
 
-Meta transactions allow someone else to pay for a user's gas fees. All opt-in methods will implement support for metatransactions. This will offer the 
+Metatransactions allow someone else to pay for a user's gas fees. All opt-in methods  implement support for metatransactions. This will offer the 
 flexibility to have users pay for their own gas or have the businesses pay.  
 
 \subsubsection{Identity Crumbs}
@@ -144,7 +143,7 @@ flexibility to have users pay for their own gas or have the businesses pay.
 
 The Protocol introduces a special EIP-721 compatible registry, called the Crumbs Contract, to facilitate data wallet synchronization when an end user 
 installs the client on a new device. When a user links a new EOA to their data wallet identity, the EOA encrypts their data wallet identity EOA (see section
-\ref{section:DataWalletIdentity}) and stores the encrypted data in the token URI of an entry in the Crumbs contract. 
+\ref{section:UserIdentityGeneration}) and stores the encrypted data in the token URI of an entry in the Crumbs contract. 
 
 During a new client installation, the end user must simply link any EOA that has previously been linked to their data wallet identity in order for the data 
 wallet to synchronize from their previously saved state that has been stored in the decentralized persistence layer of the data wallet network. The data wallet
@@ -160,13 +159,16 @@ accompanies the possession of a token can be delegated to a different address wi
 \subsubsection{Decentralized Autonomous Organization}
 \label{section:ImplementationDAO}
 
-The Protocol will include a decentralized autonomous organization (DAO) implementation. The DAO will be responsible for proposing and executing upgrades to 
+\input{ProposalLifecycleTikz}
+The Protocol will include a decentralized autonomous organization (DAO) implementation as part of its on-chain components. The DAO will be responsible for proposing and executing upgrades to 
 the Protocol. The particular pattern used by the Protocol DAO is based on Curve Finance's DAO and will be implemented with OpenZeppelin libraries. 
 
 Token holders (see section \ref{section:Token}), are responsible for the creation and execution of DAO proposals. At mainnet launch it is anticipated that one 
 token will render one vote, though this too could be modified via a DAO proposal. Token holders will have to reach a pre-specified quorum of voting power in 
-order to successfully create a proposal in the DAO task queue. Successful proposals will be subject to a delay of at least one block before they can be executed 
-in order to prevent flash loan attacks. 
+order to successfully create a proposal in the DAO task queue. 
+
+Proposals will be subject to a delay of at least one block before voting begins as well as before a queued proposed can be executed 
+in order to prevent flash loan attacks. Voters who initiate a proposal and subsequently relinquish their voting power by either selling their tokens or have their voting power revoked may have their proposal canceled if their remaining voting power is below the quorum threshold. The life-cycle of a DAO proposal is outlined in figure \ref{fig:ProposalLifecycle}.
 %----------------------------------------------------------------------------------------------------------------------------------------
 \subsection{Off-Chain Components}
 \label{section:OffChain}
@@ -190,17 +192,17 @@ by figure \ref{fig:DataWalletStructure}):
 \end{itemize}
 
 To the user, the data wallet operates in a conceptually similar way to a conventional cryptocurrency wallet, but with a wider scope. 
-Instead of key and account management of a blockchain account, a data wallet manages the storage, collection, and sharing of insights derived 
+Instead of key and account management of a blockchain account, the primary purpose of a data wallet is to manage the storage, collection, and sharing of insights derived 
 from user data. Data wallet functionality is form-factor agnostic (see section \ref{section:FormFactor}). However, browser extension and 
 mobile applications are anticipated to be the primary channels for use.
 
-\paragraph{User Data Aquisition Control Flow}
+\paragraph{User Data Acquisition and Insight Control Flow}
 \label{section:AquisitionControlFlow}
 
 \input{InsightControlFLowTikz}
 
 The acquisition of insights from the data network begins at the consent contract factory (see section \ref{section:ConsentFactory}) where an organization 
-publishes a consent registry. Data wallets belonging to end users, who have claimed a consent token via an invitation flow (section \ref{section:ConsentInvitations}),
+must first publish a consent registry. Data wallets belonging to end users who have claimed a consent token via an invitation flow (section \ref{section:ConsentInvitations})
 detect $requestForData$ events from the associated consent registry. The event will reveal a CID which resolves to query definition file (section \ref{section:RequestForData}). 
 The query execution layer of the data wallet will parse the query definition, construct the associated abstract syntax tree (AST), and apply the logic to the
 data wallet persistence layer in a manner consistent with the conditions given by the user's on-chain permission settings (section \ref{section:UserPermissions}). This
@@ -209,24 +211,30 @@ control flow is outlined in figure \ref{fig:InsiteControlFlow}.
 \paragraph{User Identity Generation via Key Ratchets}
 \label{section:UserIdentityGeneration}
 
-Users can index data from multiple EOAs or smart wallets in their data wallet. However, if they were to use these addresses directly in the participation of 
-the Protocol for consent token ownership, it would readily allow for chain analysis of user behavior and compromise user data privacy. Therefor, a data wallet
-implementation should provide key ratchet utilities to allow for the deterministic generation of new EOAs that cannot be linked back to the generating EOAs. 
+A data wallet should allow users to index transaction history and asset owership from multiple EOAs or smart wallets. However, if they were to use these addresses directly in the participation of 
+the Protocol for consent token ownership it would readily allow for chain analysis of user behavior and compromise user data privacy. Therefor, a data wallet
+implementation should provide key ratchet utilities to allow for the deterministic generation of new EOAs that cannot be linked back to the generating EOAs which have the dedicated purpose of holding consent tokens. 
 
-A ratchet is a simple machine that only allows for state increments in one direction and prevents backward traversal of the state path. Likewise, a cryptographic
+A ratchet is a simple machine that only allows unidirectional state increments and prevents backward traversal of the state path. Likewise, a cryptographic
 key ratchet is an algorithm that allows for the deterministic generation of new public-private key pairs in a manner that precludes the feasibility of determining
-what public-private key pairs were used in previous iterations. 
+what public-private key pairs were used in previous iterations. Cryptographic ratchet algorithms are widely used in consumer-facing private messaging applications
 
-\begin{algorithmic}
-  \State $i \gets 10$
-  \If{$i\geq 5$} 
-      \State $i \gets i-1$
-  \Else
-      \If{$i\leq 3$}
-          \State $i \gets i+2$
-      \EndIf
-  \EndIf 
-\end{algorithmic}
+\begin{algorithm}
+\caption{Key Ratchet Pseudo-code}
+\label{alg:KeyRatchet}
+    \begin{algorithmic}
+        \Require EOA with message signing utility
+        \Ensure New EOA with no prior transaction history
+        \State Entropy $\gets$ EOA.signMessage(Pre-determined Message)
+        \State new EOA $\gets$ HMAC-SHA256(Entropy)
+        \State return new EOA
+    \end{algorithmic}
+\end{algorithm}
+
+Procedure \ref{alg:KeyRatchet} outlines the a simple technique to generate a new key from the message signing utility exposed from most consumer crypto-wallets. This 
+algorithm, used in conjunction with the Crumbs contract, described in section \ref{section:Crumbs}, can be used to enhance user data privacy by preventing the cross-referencing of linked EOAs on-chain while at the same time offering an improved user
+experience. Specifically, by using the key ratchet algorithm to derive a dedicated in-memory key pair for consent, the data wallet form factor can sign metatransactions (see section \ref{section:OptInMethods}) without multiple prompts from various wallet applications. Additionally, using derived EOAs for consent provides an additional layer of security for end user's, keeping their valuable asset-holding EOAs separate from those
+used for participating in various data pools. 
 
 \paragraph{Storage}
 \label{section:storage}
@@ -390,9 +398,9 @@ in gives people more insight into whether they want to share their data and redu
 commonwealth. If we need to add more privacy to businesses, we could add it in future versions by creating private query cohorts. See section \ref{section:Future} 
 for a discussion on future changes to the protocol that can increase privacy.
 
-\subsection{Data Ingestion Provider} % name for role?
+\subsection{Aggregation Services} % name for role?
 
-Data ingestion is the final stage of the insight aggregation process that allows subscribers to access the insights generated at the data wallet layer. 
+Data ingestion and aggregation is the final stage of the insight aggregation process that allows subscribers to access the insights generated at the data wallet layer. 
 This section will detail how the subscriber can see processed data from the user's data wallet. Any entity can assume the role of data ingestion service 
 as long as they follow the protocol and are accepted by the DAO. Snickerdoodle Labs will offer the first data ingestion provider, which will be tied to 
 a SaaS product. 

@@ -1,0 +1,49 @@
+\begin{figure}[!ht] 
+    \centering
+    % Define block styles 
+    \tikzstyle{state1a} = [circle, draw, 
+        text width=4.5em, text centered, rounded corners, minimum height=5em]
+    \tikzstyle{state1b} = [circle, draw=green!60, thick, dotted, fill=green!5, 
+        text width=4.5em, text centered, rounded corners, minimum height=5em]
+    \tikzstyle{state1c} = [circle, draw, thick, dotted, fill=gray!5,
+        text width=4.5em, text centered, rounded corners, minimum height=5em]
+    \tikzstyle{state1d} = [circle, draw=green!60, thick, fill=green!5,
+        text width=4.5em, text centered, rounded corners, minimum height=5em]
+    \tikzstyle{phase} = [rectangle, text width=9em, text centered, font=\bfseries, minimum height=4em]
+    \tikzstyle{state2} = [rectangle, draw=red!60, thick, fill=red!5, font=\bfseries,
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{state3} = [rectangle, draw=green!100, thick, fill=green!20, font=\bfseries,
+        text width=6em, text centered, rounded corners, minimum height=4em]
+    \tikzstyle{line1} = [draw, thick, -latex', text width=5em]
+    \tikzstyle{line2} = [draw, dotted, latex']
+    \tikzstyle{line3} = [draw, dotted, -latex']
+    \tikzstyle{line4} = [draw=green!60, thick, -latex']
+    \tikzstyle{line5} = [draw=gray!40, thick, -latex']
+    
+    \begin{tikzpicture}[node distance = 2cm, auto]
+        % Place nodes
+        \node [state1a] (REVIEW) {Review};
+        \node [state1a, right of=REVIEW, node distance=3.5cm] (ACTIVE) {Active};
+        \node [state1b, right of=ACTIVE, node distance=3.5cm] (SUCCEEDED) {Succeeded};
+        \node [state1c, below of=SUCCEEDED, node distance=2.5cm] (DEFEATED) {Defeated};
+        \node [state1d, right of=SUCCEEDED, node distance=3.5cm] (QUEUED) {Queued};
+        \node [state2, below of=DEFEATED, node distance=2.5cm] (CANCELED) {Canceled};
+        \node [state3, right of=CANCELED, node distance=3.5cm] (EXECUTED) {Executed};
+        \node [phase, above of=REVIEW, node distance=2cm] (CREATED) {Proposal Created};
+        \node [phase, above of=ACTIVE, node distance=2cm] (VOTEACTIVE) {Voting Active};
+        \node [phase, above of=SUCCEEDED, node distance=2cm] (ENDED) {Voting Ends};
+        \node [phase, above of=QUEUED, node distance=2cm] (TIMELOCK) {Timelock};
+        % Draw edges
+        \path [line1] (REVIEW) -- (ACTIVE);
+        \path [line3] (REVIEW) |- (CANCELED);
+        \path [line4] (ACTIVE) -- (SUCCEEDED);
+        \path [line5] (ACTIVE) -- (DEFEATED);
+        \path [line3] (ACTIVE) |- (CANCELED);
+        \path [line4] (SUCCEEDED) -- (QUEUED);
+        \path [line2] (SUCCEEDED) -- (DEFEATED);
+        \path [line3] (DEFEATED) -- (CANCELED);
+        \path [line3] (QUEUED) -- (EXECUTED);
+    \end{tikzpicture}
+    \caption{State machine diagram of the DAO proposal life-cycle.}
+    \label{fig:ProposalLifecycle}
+\end{figure}

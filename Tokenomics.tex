@@ -1,32 +1,44 @@
 \section{Tokenomics}
 \label{section:tokenomics}
 
-% Overview
-% What token will do / our objectives
-%   Pay for making queries
-%       Pay more for more consent (Pay Per View)
-%       ? Pay more for more responses (Pay Per Click) ?
-%   ? Reward for giving data ? 
-%   Helps with DAO
-% DAO
-%   - Treasury
-%   - Governance - 1:1 voting
-%   - Control upgrades + on-chain activity
-% Distribution
-%   - How are we breaking down who gets what of token
+\begin{figure}[!ht] 
+    \centering
+    \smartdiagram[circular diagram:clockwise]{DAO, Project Proposals, Exchanges, Protocol Users}
+    \caption{Lifecycle of the Protocol token.}
+    \label{fig:Tokenomics}
+\end{figure}
 
-% Probably not now but I wonder if we want to include expanding incentives for people who give verified data or store data...  
-To ensure equitable compensation and the proper incentivization of all actors, the Snickerdoodle Protocol will rely on its token as a unit of exchange. This "Doodle token" represents access to data and is proportional to the quantity of data. In addition, these tokens will be used by the Snickerdoodle DAO during voting, ensuring that all participants are represented in the protocol's governance. 
+The Protocol will issue a fungible token on mainnet launch, the technical aspects of which are given in section \ref{section:Token}. The token will serve both network governance and protocol utility purposes outlined in the follow subsections. 
 
-\subsection{Utility of The Doodle}
-The Doodle token offers utility to participants in the protocol in many ways but primarily acts as a payment system for data insights. Subscribers will pay Doodles proportional to the amount of data they are trying to utilize and the size of their data pool, while data owners can get paid Doodles as a reward for sharing data. Payment for queries can work in multiple ways. We can support a Pay-Per-View model by making subscribers pay Doodles proportional to the number of people that have consented to their data contract. We can support a Pay-Per-Click model by making subscribers pay Doodles proportional to the number of people that respond to the query. In the initial version of the protocol, we will be performing the data acquisition cost via a Pay-Per-View model because it is quicker to implement, and the initial queries will offer less targeting for privacy reasons. % easier to implement and not as many rejected queries
+\subsection{Governance}
+\label{section:Governance}
+A fundamental use case the Protocol token will be network governance. At mainnet launch, it is anticipated that one token will be eligible to cast one vote in active DAO proposals. Token voting weight could be upgraded via future DAO proposals. For implementational details about the logical structure of the Protocol DAO, see section \ref{section:ImplementationDAO}.
 
-In the future, we may include staking mechanics to improve data safety and increase the incentivize for good behavior. There may also be other Doodle incentive mechanisms used early on to incentivize market adoption.
+Protocol contract upgrades will be executable only via DAO proposals. The upgrade pattern used by the Protocol is the upgradeable beacon pattern, see section \ref{section:BeaconPattern}. DAO proposals would be capable up updating the implementation address of Protocol beacon contracts in order to augment or introduction new on-chain functionality.
 
-\subsection{Snickerdoodle DAO}
-\label{section:TokenDAO}
-Another use of the Doodle token will be as shares in the Snickerdoodle DAO. Each token will represent a single vote in the DAO (MAKE SURE THIS IS TRUE), and the voting scheme may change based on governance proposals. The DAO will also control all aspects of the protocol. At the start, this will be updates to the protocol's contracts, the plugin security model, and the treasury. In the future, this will include valid data schemes, query functions, and valid ingestors. 
+Lastly, it is anticipated that the DAO will function as a decentralized treasury, accumulating tokens spent during the utilization of the Protocol. DAO proposals can be 
+created to allocate these funds in a manner appropriate for the furthering of the Protocol as depicted in figure \ref{fig:Tokenomics}.
 
-\subsection{Distribution}
-TODO FIGURE
-The breakdown of how the token is being distributed hasn't been ironed out yet. TODO LOOK AT LITE PAPER
+\subsection{Utility Functions}
+\label{section:TokenUtility}
+
+It is anticipated that the Protocol token will have several utility use cases for initiating certain activities within the on-chain mechanics of the Protocol (see section \ref{section:OnChain} for details of on-chain components). It is desired by the Protocol designers that the token accrue value as the size of the data set represented by all data wallet users grows. The following mechanisms are likely to be implemented as on-chain logic in order to facilitate this goal:
+
+\paragraph{Factory Fees}
+The consent contract factory (section \ref{section:ConsentFactory}) will possibly require that token be spent in order to deploy a new consent registry. It is thought that requiring a token fee to publish a consent registry will disincentivize fragmentation of the data network, since it will be more expense to create multiple data pools than a single data pool. The token spent would be routed to the DAO treasury address. The fee amount would be set by DAO proposals. 
+
+\paragraph{Request-for-Data Fees}
+In order to disincentivize frivolous $requestForData$ events, it is anticipated that there will be a token fee
+required to emit these events. The fees could be a fixed cost or proportional to the number of consent tokens
+issued in the consent registry at the time of the function call. The token spent would be routed to the DAO treasury address. The fee amount and structure would be set by DAO proposals. 
+
+\paragraph{Stake for Ranking}
+
+In the scenario where there are many consent registries published by many different organizations for varying purposes, it will be necessary to have a built-in search mechanism to enable data wallet users to find data pools that fit their interests. The Protocol may introduce a staking registry where consent registry
+publishers stake token in order to boost their indexed ranking in the list. This could be further granularized by introducing different verticals that stake could be allocated towards (some examples could be gaming, trading, consumer products, etc.). Data wallet implementations could leverage this staked ranking registry in order to present appropriate data pools to users based on the content of the data stored in their wallets. 
+
+Organizations could reclaim their staked token when a boosted ranking is no longer relevant for their consent registry, with some fraction of the token held back for the DAO treasury. Staking organizations that abuse the ranking system would be at risk of having their stake forfeited to the DAO treasury in its entirety and the ranking eliminated by a DAO proposal. 
+
+\subsection{Token Distribution}
+\input{TokenDistributionTikz}
+The Protocol token (section \ref{section:Token} is capped to a total of 13.5 billion. The allocation of the token supply is given in figure \ref{fig:TokenDistribution}. The Protocol Foundation will be allocated the largest percentage of the supply at the time of token generation with Snickerdoodle Labs (SDL) receiving 20 percent of the supply.

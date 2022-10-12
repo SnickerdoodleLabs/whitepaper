@@ -32,12 +32,12 @@
         % Draw edges
         \path [line] (CC) -- node {requestForData event} (identify);
         \path [line] (identify) -- node {CID resolution and query fetch} (evaluate);
-        \path [line] (evaluate) -- node {AST Evaluation} (permissions);
+        \path [line] (evaluate) -- node {AST Processing} (permissions);
         \path [line] (permissions) -- node {read only access} (data);
         \path [linesansserif] (data) -- (asdf);
         \path [line] (asdf) |- node [near start,left] {query results} (evaluate);
-        \path [line,dashed] (CCF) -- (CC);
-        \path [line,dashed] (evaluate) -- (AS);
+        \path [line,dashed] (CCF) -- node {deploy} (CC);
+        \path [line,dashed] (evaluate) -- node [text width=2cm] {signed insights} (AS);
     \end{tikzpicture}
     \caption{Control Flow from requesting to receiving an insight from the data wallet network.}
     \label{fig:InsiteControlFlow}
