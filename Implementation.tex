@@ -15,14 +15,14 @@ At the core of the control plane is an upgradable contract factory which produce
 Consent tokens claimed from these consent contracts are non-transferable but can be burned by the recipient. Claiming a consent token denotes a data 
 wallet user's consent to participate in network queries in return for rewards (which may or may not be web3 digital assets). 
 
-Data wallets receive queries via EVM events emitted from consent registry contracts they have claimed tokens in. These events contain metadata encoding
-instructions (written in SDQL) to run computations on the data stored in the data wallet to produce insights. Once a data wallet has produced
+Data wallets receive queries via Ethereum Virtual Machine (EVM) events emitted from consent registry contracts they have claimed tokens in. These events contain metadata encoding
+instructions (written in Synamint Query Language) to run computations on the data stored in the data wallet to produce insights. Once a data wallet has produced
 the requested insight, it performs a digital "handshake" with the aggregation service provider specified in the query metadata such that the 
-data wallet owner receives a reward while the requesting organization receives the insight, see figure \ref{fig:OnChainOffChain}. 
+data wallet owner receives a reward while the requesting organization receives the anonymized insight, see figure \ref{fig:OnChainOffChain}. 
 
 User consent and data flow is thus orchestrated in a distributed manner by the Protocol. It is also worth highlighting that while 
-Snickerdoodle Labs will develop service infrastructure for the protocol (such as producing a data wallet and a SaaS product offering 
-for enterprise participation in the protocol), the protocol itself is, however, permissionless and open so that anyone could implement a 
+Snickerdoodle Labs will develop service infrastructure for the Protocol (such as producing a data wallet client and an associated SaaS product offering 
+for enterprise participation in the Protocol), the protocol itself is, however, permissionless and open so that anyone could implement a 
 data wallet client or act as an aggregation service provider if the specifications of the protocol is adhered to. 
 %----------------------------------------------------------------------------------------------------------------------------------------
 \subsection{On-Chain Components}
@@ -32,7 +32,7 @@ data wallet client or act as an aggregation service provider if the specificatio
 \label{section:ConsentFactory}
 
 \input{ConsentContractPubSubTikz}
-The on-chain components of the Protocol function as a decentralized, permissionless data control plane. It specifically implements a publish-subscribe pattern
+The on-chain components of the Protocol function as a decentralized, permissionless, and trustless data control plane. It specifically implements a publish-subscribe pattern
 in which organizations publish new instances of an EIP-721 compatible consent registry (see \ref{section:ConsentContract}), and end-users 
 subscribe to the registries by claiming a non-transferrable consent token. The publishing action is performed via the Protocol's upgradable 
 consent contract factory, see figure \ref{fig:ConsentFactory}. The factory contract will be the entrypoint to the Protocol for new insight 
@@ -72,8 +72,8 @@ under which data is to be collected and used as well as a cryptographically veri
 have given consent to participate in the data pool. 
 
 Consent registries expose an EIP-721 compatible interface. This is for developer integration convenience as it allows consent registries to 
-be readable by most existing NFT indexing services (such as Snowtrace). Consent is denoted by ownership of a non-transferrable consent NFT 
-(non-fungible token) which can be burned by the NFT owner at any time. 
+be readable by most existing NFT (non-fungible token) indexing services (such as Snowtrace). Consent is denoted by ownership of a non-transferrable consent NFT 
+ which can be burned by the NFT owner at any time. 
 
 \paragraph{Request-for-Data Events}
 \label{section:RequestForData}
@@ -97,14 +97,14 @@ on-chain contracts they have interacted with using their linked EOA asset accoun
 attributes. 
 
 Every consent token issued from a consent registry has an associated set of binary $agreementFlags$. There are 256 flags in total (the size of an EVM word) 
-though not all flags will be assigned to specific attributes at Protocol launch, leaving room for customization. Only the owner of a consent token can 
+though not all flags will be assigned to specific data attributes at Protocol launch, leaving room for customization. Only the owner of a consent token can 
 update the granular permissions denoted by the token's $agreementFlag$s. The availability of granular consent data on-chain allows organizations to better 
 understand what kinds of insights they will be able to obtain from their data pool before calling $requestForData$. 
 
 \paragraph{Consent Invitations}
 \label{section:ConsentInvitations}
 
-Consent registry metadata is used for the decentralized, trustless, and tamper-resistant triggering of user flows that should be presented to the data wallet 
+Consent registry metadata is used for the decentralized, permissionless, and trustless triggering of user flows that should be presented to the data wallet 
 end user in a format appropriate for the data wallet client environment. In a web browser setting, the data wallet detects the current active URL, and via DNS 
 over HTTPS (DoH) queries the TXT records associated with the apex domain. If the TXT record contains a reference to a Protocol consent 
 contract address, the data wallet then fetches the URLs registered in the consent registry $domains$ metadata storage variable and cross-references the domains 
@@ -128,15 +128,15 @@ the data pool associated with a consent registry. There are two available method
 The former method
 requires that the recipient EOA be known in advance by the $SIGNER\_ROLE$ in order to construct the appropriate signature. The receiving EOA then 
 becomes the only account that can call $restrictedOptIn$ with that signature. If the recipient EOA address is not known ahead of time, the $SIGNER\_ROLE$
-can construct a signature for use with the $anonymousRestrictedOptIn$ method in which any EOA can submit the signature to that method in order to opt-in. Once a signature that was constructed for use with either invite only method is used, it cannot be used a second time. 
+can construct a signature for use with the $anonymousRestrictedOptIn$ method in which any EOA can submit the signature to that method in order to opt-in. Once a opt-in signature is used, it cannot be used a second time. 
 
 Support for both open and invitation-only opt-in flows makes the Protocol flexible to a variety of use-cases. However, end users are often hesitant to 
 spent their own cryptocurrency in order to pay for transaction fees associated with a decentralized application or simply do not have the tokens 
 necessary to do so. Additionally, requiring the user to spend their own assets to participate in the Protocol intoduces significant user friction and
 adoption hurdles. Consent registries implement EIP-2772 compatible metatransaction capabilities to circumvent this issue. 
 
-Metatransactions allow someone else to pay for a user's gas fees. All opt-in methods  implement support for metatransactions. This will offer the 
-flexibility to have users pay for their own gas or have the businesses pay.  
+Metatransactions enable the delegation of a user's transaction gas fees to another party in a manner that ensures that the user's transaction cannot be maliciously altered. All opt-in methods  implement support for EIP-2772 compatible metatransactions. This will offer the 
+flexibility to have users pay for their own transaction gas fees or have the insight consumer pay.  
 
 \subsubsection{Identity Crumbs}
 \label{section:Crumbs}
@@ -145,7 +145,7 @@ The Protocol introduces a special EIP-721 compatible registry, called the Crumbs
 installs the client on a new device. When a user links a new EOA to their data wallet identity, the EOA encrypts their data wallet identity EOA (see section
 \ref{section:UserIdentityGeneration}) and stores the encrypted data in the token URI of an entry in the Crumbs contract. 
 
-During a new client installation, the end user must simply link any EOA that has previously been linked to their data wallet identity in order for the data 
+During a new data wallet client installation, the end user must simply link any EOA that has previously been linked to their data wallet identity in order for the data 
 wallet to synchronize from their previously saved state that has been stored in the decentralized persistence layer of the data wallet network. The data wallet
 checks if the account being linked owns a token in the Crumbs contract; if so, it reads the encrypted content of the token URI, decrypts the information, and loads 
 the public-private key pair into memory. 
@@ -153,7 +153,7 @@ the public-private key pair into memory.
 \subsubsection{EIP-20 Token}
 \label{section:Token}
 The Protocol includes a fungible utility token adhering to the EIP-20 standard. This token will be used for paying various fees required to leverage
-the Protocol (like publishing a new consent registry) and will also be used for voting in the Protocol DAO. The associated voting mechanism that 
+the Protocol (like publishing a new consent registry) and will also be used for voting in the Protocol DAO (see Tokenomics in section \ref{section:tokenomics}). The associated voting mechanism that 
 accompanies the possession of a token can be delegated to a different address without relinquishing ownership of the token
 
 \subsubsection{Decentralized Autonomous Organization}
@@ -196,7 +196,7 @@ Instead of key and account management of a blockchain account, the primary purpo
 from user data. Data wallet functionality is form-factor agnostic (see section \ref{section:FormFactor}). However, browser extension and 
 mobile applications are anticipated to be the primary channels for use.
 
-\paragraph{User Data Acquisition and Insight Control Flow}
+\paragraph{Insight Acquisition and Control Flow}
 \label{section:AquisitionControlFlow}
 
 \input{InsightControlFLowTikz}
@@ -213,11 +213,11 @@ control flow is outlined in figure \ref{fig:InsiteControlFlow}.
 
 A data wallet should allow users to index transaction history and asset owership from multiple EOAs or smart wallets. However, if they were to use these addresses directly in the participation of 
 the Protocol for consent token ownership it would readily allow for chain analysis of user behavior and compromise user data privacy. Therefor, a data wallet
-implementation should provide key ratchet utilities to allow for the deterministic generation of new EOAs that cannot be linked back to the generating EOAs which have the dedicated purpose of holding consent tokens. 
+implementation should provide key ratchet utilities to allow for the deterministic generation of new EOAs (that cannot be linked back to the generating EOAs) which have the dedicated purpose of holding consent tokens. 
 
 A ratchet is a simple machine that only allows unidirectional state increments and prevents backward traversal of the state path. Likewise, a cryptographic
-key ratchet is an algorithm that allows for the deterministic generation of new public-private key pairs in a manner that precludes the feasibility of determining
-what public-private key pairs were used in previous iterations. Cryptographic ratchet algorithms are widely used in consumer-facing private messaging applications
+key ratchet is an algorithm that allows for the deterministic generation of new public-private key pairs, using a prior key pair as inputs, in a manner that precludes the feasibility of determining
+what public-private key pairs were used in previous iterations. Cryptographic ratchet algorithms are widely used today in consumer-facing private messaging applications.
 
 \begin{algorithm}
 \caption{Key Ratchet Proto-algorithm}
@@ -241,32 +241,27 @@ used for participating in various data pools.
 \paragraph{Storage}
 \label{section:storage}
 
-Secure storage of data is crucial to allowing end users to own their data. The initial data wallet implementation produced by 
-Snickerdoodle Labs exposes a modular storage interface capable of integrating with various storage provider technologies, 
+Secure storage of data is crucial to allowing end users to own their data. The Protocol does not specify a schema for local storage of user data; that is left to the party implementing a data wallet client. However, the storage layer of a data wallet client should allow for secure, tamper-resistant, and platform independent synchronization of user data across multiple client installations.  
+
+The initial data wallet implementation produced by Snickerdoodle Labs exposes a modular storage interface capable of integrating with various object storage provider technologies, 
 such as Google Storage, Amazon S3, or decentralized options like the Ceramic Network.
 
 It is also important to call out the wallet's storage of public-private key pairs. A data wallet should only store public keys 
-and digital signatures associated with accounts linked to a user's data wallet, not private keys. 
-Instead, we integrate with existing wallets (e.g., MetaMask) for key management.
+and digital signatures associated with accounts linked to a user's data wallet, not private keys (other than the in-memory keys generated via key ratchet iterations used for holding consent tokens, see section \ref{section:UserIdentityGeneration}). 
+Instead, data wallet client implementations should delegate the management of asset-bearing keys to dedicated wallet applications like MetaMask, Coinbase Wallet, etc. 
 
-\paragraph{Data Ingestion}
+
+\paragraph{User Data Ingestion and Indexing}
 \label{section:DataIngestion}
-The data wallet will also help users own their own data by allowing them to collect the data that they generate. This individualized data mining 
-provides highly accurate data that the protocol allows users to easily monetize. The data the wallet collects has three important properties: 
-explicit/implicit, first/third party, and authenticated/unauthenticated. %Not sure if there's a better term
 
-% should be included but I'm not sure where or how
-An important feature to highlight is that multiple addresses can be linked together in the same data wallet, including wallets for separate chains. 
+A data wallet client should implement automatic data collection utilities appropriate for the deployment environment of the client. For example, a browser extension client may collect metrics on sites visited and time spent on those pages. A mobile application client may collect geo-location information. Regardless of 
+the attributes a data wallet client is collecting in a particular form-factor, attributes can be categorized via three important properties: explicit/implicit, first/third party, and authenticated/unauthenticated. 
 
 % Not sure if this should be a paragraph or points
 \paragraph{Explicit/Implicit}
-The data wallet will either collect data through explicit or implicit means. Explicit data is data directly provided by the user, such as their name, 
-age, or wallet address. In the initial version of the data wallet, the user will manually input this data; however, in the future, the data wallet 
-could feature in-browser event capturing to passively collect this data (e.g., collecting information about what websites a user has visited).
+The data attributes collected by a data wallet client can be considered explicit or implicit attributes. Explicit data is data must be indexed and stored in its entirety by the data wallet client in order to produce insights from it. Explicit data offers no deterministic mechanism to regenerate the data set from scratch if it is lost. Implicit data does not require storage of every data element of the attribute in order to evaluate functions to produce insights and can be deterministically recovered if lost. 
 
-
-Implicit data is data generated by user action. For example, using a user's wallet address to learn that they swapped specific tokens or have played a web3 game. 
-
+A simple example of an explicit data attribute would be a user's date of birth and geo-location history. This data must be stored by the data wallet in its entirety to generate insights and if it is lost, it cannot be easily reproduced without an dedicated backup. An example of implicit data is a user's on-chain transaction history. Transaction history can be recovered deterministically by simply linking asset accounts to the user's data wallet. Additionally, the entirety of the user's transaction history does not need to be available at all times, it can be fetched as needed when an insight requires accessing it. 
 
 \paragraph{First/Third Party}
 Data collected can come from different sources. Specifically, first-party data comes directly from the user, and third-party data comes from 
@@ -283,39 +278,146 @@ credential authority (this is the fundamental operating principal of certificate
 
 The data wallet is a local application that stores the owner's data securely and processes computations locally. By collecting and 
 securely storing user data locally, the data wallet guarantees data ownership to the user by never sharing it. Because computations 
-are running locally, the owner ensures that only analysis they've given consent to can run on their data. Businesses also benefit 
-from this model as they can leverage data-driven insights without worrying about the liability or infrastructure of storing raw, 
-personal data. While the initial version of localized processing will be more limited, there is a myriad of ways we can modify this 
+are running locally, the owner ensures that only analysis they've given consent to can run on their data. Insight consumers also benefit 
+from this model as they can leverage data-driven insights without the risk of liability associated with the custody of user personal identifying information (PII). While the initial version of localized processing will be more limited, there is a myriad of ways we can modify this 
 approach to add additional data safety and features (see section \ref{section:Future}). 
 
-The wallet will learn what computations to run by listening to on-chain events. These events will be emitted on the Snickerdoodle Avalanche 
-subnet and specify SDQL queries that include the computation instructions. If those data request events are from consent contracts that the 
-user has opted into, the data wallet will process the data following the rules in the associated SDQL query. After the localized processing 
-has been completed, the data wallet will send the insights to the specified endpoint, and the data owner will collect any rewards.
+The wallet will learn what computations to run by listening to on-chain $requestForData$ events as depicted in figure \ref{fig:InsiteControlFlow}. These queries are written in a simple language specified by the Protocol. This language, called Synamint Query Language, is discussed in section \ref{section:SyQL}
 
+\subsubsection{Synamint Query Language (SyQL)} % maybe move to contracts 
+\label{section:SyQL}
 
-\subsubsection{Protocol Query Language} % maybe move to contracts 
-\label{section:SDQL}
+The Protocol specifies a simple query language, called Synamint Query Language (SyQL), which will allow insight consumers to broadcast conditional insight requests to consent registry cohorts in a transparent and interpretable fashion. 
+SyQL is structured in JSON format containing information on the eligibility requirements, rewards, data to be collected, what processing 
+to perform, and where to send processed data (as depicted in the insight delivery edge in figure \ref{fig:InsiteControlFlow}). Queries written in SyQL should be stored on a content-addressable network, such as IPFS, to ensure tamper resistance. 
 
-The Protocol specifies a simple query language which will allow businesses to broadcast conditional data requests to consent registry cohorts in a transparent and interpretable fashion. 
-It will be structured as a simple JSON file containing information on the eligibility requirements, rewards, data to be collected, what processing 
-to perform, and where to send processed data (see figure TODO). The allowed functions and syntax of the language will be enforced by the 
-Snickerdoodle DAO and determined by token holders, which will allow for its continued development and the enforcement of user privacy. SDQL 
-queries must be stored on a content-addressable distributed network, such as IPFS, to ensure tamper resistance. 
+A SyQL is written by specifying nested keywords with associated parameters that inform the data wallet client query processing engine what data attributes are being requested and what insights to return given conditional statement that are met by the user's data state. The keywords associated with SyQL and their intended usage and behavior are given in the following subsections (note that the SyQL specification is subject to change before mainnet launch of the Protocol): 
 
-TODO FIGURE SHOWING QUERY + flesh out sections
+\paragraph{version (required)}
 
-\paragraph{Rewards}
+The $version$ keyword is reserved for specifying the version of the SyQL schema a query is based on. This keyword has no sub-keywords.
 
-An essential part of the protocol is allowing individuals to get value from their rewards. The data wallet will facilitate this by allowing users 
-to gain rewards for sharing their data. First, the data wallet helps people find rewards that are being offered. If a person goes to a website 
-that's enabled the Snickerdoodle Protocol, they will see a pop-up and can connect their data wallet to check out possible rewards. Additionally, 
-the data wallet will have a section showing available rewards.
+\paragraph{timestamp (required)}
 
+The time when the SyQL query is created in ISO 8601 format, i.e., YYYY-MM-DDTHH:MM:SS. For an example, 20:20:39 on 13 of November 2021 is represented as 2021-11-13T20:20:39. This keyword has no sub-keywords.
 
-Once the user has given consent to share data, the data wallet will also help the user manage their rewards. When they receive a query, they will 
-be able to visualize the rewards offered in that query. The owner will also be able to set which addresses and chains they want to receive rewards. 
-Additionally, the owner will be able to see the history of the rewards they've received and the data exchanged. 
+\paragraph{expiry (required)}
+
+The time when the SyQL query is expired in ISO 8601 format. Queries that are recieved after this time are considered stale and will not be executed or rewarded. There are no sub-keywords associated with this top-level keyword. 
+
+\paragraph{description (required)}
+
+The $description$ keyword is used for specifying text, markdown, or HTML intended to be displayed to the recipient of a query. There are no sub-keywords. 
+
+\paragraph{business (required)}
+
+This keyword is reserved for indicating what entity is broadcasting a query. It has no sub-keywords. 
+
+\paragraph{queries (required)}
+
+The $queries$ keyword is used to indicate that a SyQL file is requesting access to the data wallet persistence layer. One or more instances must be specified with a queries block. These query instances can then be referenced by other top-level keywords. A query instances has the following sub-keywords:
+
+\begin{itemize}
+    \item $name$: The $name$ sub-keyword indicates which attribute must be accessed in the data wallet persistence layer. Supported attributes should include:
+    \begin{itemize}
+        \item network: accesses the Web3 data associated with all accounts linked to a data wallet identity
+        \item age: access to the age of the data wallet user
+        \item location: access to the location data of the data wallet user
+        \item browsing\_history: access to the browsing history of the data wallet user
+        \item gender: access to the gender field of the data wallet user
+        \item url\_visited\_count: access the number of times URLs are visited by the data wallet user
+        \item chain\_transactions: accesses the transaction volume (in USD) and count by the data wallet user
+        \item balance: accesses the balance of the data wallet user on a per-chain basis
+    \end{itemize}
+    \item $return$: The $return$ sub-keyword specifies the object type that will be returned by a query. Supported types include:
+    \begin{itemize}
+        \item boolean: true or false depending on the conditions applied to the attribute being accessed
+        \item integer: returns an integer object related to the referenced attribute
+        \item enum: returns an enum related to the referenced attributed. The enum keys are specified under enum\_keys sub-keyword
+        \item object: returns an object to describe the referenced attributed. The object schema is specified in object\_schema sub-keyword
+        \item array: returns an array to describe the referenced attributed. The array items are specified in array\_items sub-keyword
+        \item string: returns a string to describe the attribute of interest. The string patter is described using string\_pattern sub-keyword.
+    \end{itemize}
+    \item $conditions$: Conditions are used in conjunction with the boolean return type. A conditions are used to specify the filter to apply to the attribute in order to determine if true or false should be returned. The following conditions are supported:
+    \begin{itemize}
+        \item in: is the attribute in a set of objects
+        \item ge: is the attribute greater or equal than a given object
+        \item l: is the attribute less than an object
+        \item le: is the attribute less than or equal to an object
+        \item e: is the attribute equal to an object
+        \item g: is the attribute greater than an object
+        \item has: does the attribute include a set of objects
+    \end{itemize}
+    \item $networkid$: This sub-keyword is used in conjunction with the balance attribute type. This sub-keyword allows for the specification of which layer 1 protocols a balance query should be run against. The following networkid are supported:
+    \begin{itemize}
+        \item SOL: Solana network
+        \item 1: Ethereum Mainnet
+        \item 4: Ethereum Testnet (Rinkeby)
+        \item 42: Ethereum Testnet (Kovan)
+        \item 43114: Avalanche Mainnet 
+        \item 43113: Avalanch Testnet (Fuji)
+        \item 137: Polygon Mainnet
+        \item 80001: Polygon Testnet (Mumbai)
+        \item *: all supported networks
+    \end{itemize}
+    \item $chain$: This sub-keyword is used in conjunction with the network attribute type. This sub-keyword allows for the specification of which layer 1 protocols a network query should be run against. The following chains are supported:
+    \begin{itemize}
+        \item ETH: Ethereum Mainnet
+        \item AVAX: Avalanche Mainnet
+    \end{itemize}
+    \item $contract$: The $contract$ sub-keyword is used in conjunction with the network sub-keyword. Specifying a contract indicates that the query is interrogating whether any accounts linked to a data wallet have made transactions meeting the following required characteristics:
+    \begin{itemize}
+        \item address: address of the smart contract of interest
+        \item networkid: chain ID that the smart contract is deployed to
+        \item function: function ABI on the target smart contract
+        \item direction: was the user's account in the to or from field
+        \item token: is the contract an ERC20 or ERC721 standard
+        \item timestamp: did the account submit a matching transaction between start and end timestamp
+    \end{itemize}
+    \item $enum\_keys$: This sub-keyword is used in conjunction with the enum attribute type. Listing the keys that the attribute type supports.
+    \item $object\_schema$: This sub-keyword is used in conjunction with the object attribute type. Specifying the schema of the object including the properties, patternProperties (properties with regex formatted keys), and required properties of the object.
+    \item $string\_pattern$: This is used to describe the pattern of the string attribute, using Regular Expression (RegEx).
+    \item $array\_items$: This sub-keyword is used in conjunction with the array attribute type. Specifying the items of the array. The following array\_items are supported:
+    \begin{itemize}
+        \item boolean: an array of booleans
+        \item integer: an array of integers
+        \item object: an array of objects described with object\_schema
+        \item array: an array of arrays
+        \item number: an array of numbers
+    \end{itemize}
+\end{itemize}
+
+\paragraph{returns}
+
+The $returns$ keyword is used to specify one or more candidate return objects that may be delivered to an insight aggregator. A return object has the following sub-keywords:
+\begin{itemize}
+    \item $name$: What is the type of return
+    \begin{itemize}
+        \item callback: resolves immediately to a pre-specified message delivered to a callback url
+        \item query\_response: resolves to the result of the specified query
+    \end{itemize}
+    \item $message$: An explicit string message to be returned as a result. Used with the callback return type.
+    \item $query$: A reference to a query specified in the queries block. Used in conjunction with the query\_response return type.
+    \item $url$: A complete URL specifying the location of the aggregation service associated with this SyQL file.
+\end{itemize}
+
+\paragraph{compensations (required)}
+
+The $compensations$ keyword is used to declare one or more possible digital assets associated with the SDQL file. Below are the following required characteristics of the compensations:
+
+\begin{itemize}
+    \item $description$: A text, markdown, or html string for displaying to the user information about the digital asset.
+    \item $callback$: A callback URL for claiming the digital asset.
+\end{itemize}
+
+\paragraph{logic}
+
+The $logic$ keyword is used to specify arbitrary logic to components specified in the queries, returns, and compensations blocks.
+
+\begin{itemize}
+    \item $returns$: A sub-keyword of logic used to specify an array of return expressions. A return expression can return objects declared in the returns block given that objects declared in queries have sufficient permissions to access the requisite attributes of the persistence layer.
+    \item $compensations$: A sub-keyword of logic used to specify an array of compensation expressions. A compensation expression can return objects declared in the compensations block given that objects declared in queries have sufficient permissions to access the requisite attributes of the persistence layer.
+\end{itemize}
 
 \subsubsection{Aggregation Services} % name for role?
 
@@ -326,7 +428,7 @@ a SaaS product.
 
 \paragraph{Insight Ingestion}
 The final step of the protocol is for data wallets to send insights from their queries to an endpoint. This endpoint is the ingestion provider and is 
-specified in the SDQL query. Ingestion is an integral part of the protocol as it allows businesses to see the insights they have paid for.
+specified in the SYQL query. Ingestion is an integral part of the protocol as it allows businesses to see the insights they have paid for.
 
 Once the ingestion provider receives the insight, it must store the insights events and manage access. They can also provide any additional services 
 they want on top of this, such as providing a dashboard to view insights. There is no way to mathematically guarantee any ingestion provider is behaving 

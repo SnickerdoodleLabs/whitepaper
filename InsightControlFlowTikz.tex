@@ -32,7 +32,7 @@
         % Draw edges
         \path [line] (CC) -- node {requestForData event} (identify);
         \path [line] (identify) -- node {CID resolution and query fetch} (evaluate);
-        \path [line] (evaluate) -- node {AST Processing} (permissions);
+        \path [line] (evaluate) -- node {AST processing} (permissions);
         \path [line] (permissions) -- node {read only access} (data);
         \path [linesansserif] (data) -- (asdf);
         \path [line] (asdf) |- node [near start,left] {query results} (evaluate);
